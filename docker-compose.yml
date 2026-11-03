@@ -1,0 +1,16 @@
+services:
+  veltrix:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veltrix-app
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - veltrix_data:/app/data
+
+volumes:
+  veltrix_data:

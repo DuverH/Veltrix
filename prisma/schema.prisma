@@ -1,0 +1,433 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ==================== USERS & AUTH ====================
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("ACCOUNTANT") // ADMIN, ACCOUNTANT, VIEWER
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companies    UserCompany[]
+  journalEntries JournalEntry[]
+  auditLogs    AuditLog[]
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  taxId     String   @unique
+  address   String?
+  phone     String?
+  email     String?
+  logo      String?
+  currency  String   @default("COP")
+  country   String   @default("CO")
+  fiscalYear Int     @default(12) // month when fiscal year ends
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users            UserCompany[]
+  accounts         Account[]
+  entries          JournalEntry[]
+  invoices         Invoice[]
+  assets           FixedAsset[]
+  contacts         Contact[]
+  bankAccounts     BankAccount[]
+  closingPeriods   ClosingPeriod[]
+  productionOrders ProductionOrder[]
+  systemConfig     SystemConfig?
+  auditLogs        AuditLog[]
+  integrations     Integration[]
+  warehouses       Warehouse[]
+  inventoryItems   InventoryItem[]
+  kardexMovements  KardexMovement[]
+}
+
+model UserCompany {
+  id        String   @id @default(cuid())
+  userId    String
+  companyId String
+  role      String   // ADMIN, ACCOUNTANT, VIEWER
+
+  user      User     @relation(fields: [userId], references: [id])
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  @@unique([userId, companyId])
+}
+
+// ==================== CHART OF ACCOUNTS ====================
+model Account {
+  id          String   @id @default(cuid())
+  code        String   // e.g. "1000", "1105"
+  name        String
+  type        String   // ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE
+  subtype     String?  // CURRENT_ASSET, FIXED_ASSET, CURRENT_LIABILITY, etc.
+  description String?
+  parentId    String?
+  companyId   String
+  isActive    Boolean  @default(true)
+  allowsEntry Boolean  @default(true) // false for summary accounts
+
+  parent    Account?  @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children  Account[] @relation("AccountHierarchy")
+  company   Company   @relation(fields: [companyId], references: [id])
+
+  lines     JournalLine[]
+
+  @@unique([code, companyId])
+}
+
+// ==================== JOURNAL ENTRIES (LIBRO DIARIO) ====================
+model JournalEntry {
+  id            String   @id @default(cuid())
+  number        Int?     // auto-incremented per company
+  date          DateTime
+  description   String
+  reference     String?  // external reference
+  type          String   @default("MANUAL") // MANUAL, DEPRECIATION, AMORTIZATION, CLOSING, INVOICE, BANK
+  status        String   @default("DRAFT") // DRAFT, POSTED, REVERSED
+  periodId      String?
+  companyId     String
+  createdById   String?
+  reversalOfId  String?  // for reversed entries
+
+  company       Company       @relation(fields: [companyId], references: [id])
+  period        ClosingPeriod? @relation(fields: [periodId], references: [id])
+  createdBy     User?         @relation(fields: [createdById], references: [id])
+  lines         JournalLine[]
+  invoice       Invoice?      @relation("InvoiceEntry")
+}
+
+model JournalLine {
+  id          String   @id @default(cuid())
+  entryId     String
+  accountId   String
+  description String?
+  debit       Float    @default(0)
+  credit      Float    @default(0)
+
+  entry       JournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  account     Account      @relation(fields: [accountId], references: [id])
+}
+
+// ==================== INVOICING (FACTURACIÓN ELECTRÓNICA) ====================
+model Contact {
+  id          String   @id @default(cuid())
+  type        String   // CUSTOMER, SUPPLIER, BOTH
+  name        String
+  taxId       String?
+  email       String?
+  phone       String?
+  address     String?
+  city        String?
+  country     String   @default("CO")
+  creditLimit Float?
+  paymentDays Int      @default(30)
+  isActive    Boolean  @default(true)
+  companyId   String
+  createdAt   DateTime @default(now())
+
+  company   Company   @relation(fields: [companyId], references: [id])
+  invoices  Invoice[]
+}
+
+model Invoice {
+  id            String    @id @default(cuid())
+  number        String
+  date          DateTime
+  dueDate       DateTime?
+  type          String    // RECEIVABLE (venta), PAYABLE (compra)
+  status        String    @default("DRAFT") // DRAFT, ISSUED, PAID, PARTIAL, OVERDUE, CANCELLED
+  subtotal      Float     @default(0)
+  taxAmount     Float     @default(0)
+  discountAmt   Float     @default(0)
+  total         Float
+  paidAmount    Float     @default(0)
+  notes         String?
+  xmlData       String?   // Electronic invoice XML
+  cufe          String?   // Unique electronic billing code
+  qrCode        String?
+  contactId     String?
+  journalEntryId String?  @unique
+  companyId     String
+
+  company       Company      @relation(fields: [companyId], references: [id])
+  contact       Contact?     @relation(fields: [contactId], references: [id])
+  journalEntry  JournalEntry? @relation("InvoiceEntry", fields: [journalEntryId], references: [id])
+  lines         InvoiceLine[]
+  payments      Payment[]
+}
+
+model InvoiceLine {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Float    @default(1)
+  unitPrice   Float
+  discount    Float    @default(0)
+  taxRate     Float    @default(0)
+  total       Float
+
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  date        DateTime
+  amount      Float
+  method      String   // CASH, TRANSFER, CARD, CHECK
+  reference   String?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  invoice     Invoice @relation(fields: [invoiceId], references: [id])
+}
+
+// ==================== FIXED ASSETS (ACTIVOS FIJOS) ====================
+model FixedAsset {
+  id               String   @id @default(cuid())
+  code             String?
+  name             String
+  description      String?
+  category         String   @default("EQUIPMENT") // EQUIPMENT, VEHICLE, BUILDING, LAND, INTANGIBLE
+  acquisitionDate  DateTime
+  cost             Float
+  salvageValue     Float    @default(0)
+  usefulLifeYears  Int      @default(5)
+  depreciationMethod String @default("STRAIGHT_LINE") // STRAIGHT_LINE, DECLINING_BALANCE
+  depreciationRate Float    // annual rate
+  accumulatedDep   Float    @default(0)
+  status           String   @default("ACTIVE") // ACTIVE, DISPOSED, FULLY_DEPRECIATED
+  location         String?
+  companyId        String
+  createdAt        DateTime @default(now())
+
+  company              Company               @relation(fields: [companyId], references: [id])
+  depreciationHistory  AssetDepreciation[]
+}
+
+model AssetDepreciation {
+  id         String   @id @default(cuid())
+  assetId    String
+  period     String   // e.g. "2026-01"
+  amount     Float
+  runDate    DateTime @default(now())
+
+  asset      FixedAsset @relation(fields: [assetId], references: [id])
+}
+
+// ==================== BANKING (CUENTAS BANCARIAS) ====================
+model BankAccount {
+  id            String   @id @default(cuid())
+  name          String
+  bankName      String
+  accountNumber String
+  accountType   String   @default("CHECKING") // CHECKING, SAVINGS
+  currency      String   @default("COP")
+  currentBalance Float   @default(0)
+  isActive      Boolean  @default(true)
+  companyId     String
+  createdAt     DateTime @default(now())
+
+  company          Company           @relation(fields: [companyId], references: [id])
+  transactions     BankTransaction[]
+  reconciliations  BankReconciliation[]
+}
+
+model BankTransaction {
+  id            String   @id @default(cuid())
+  bankAccountId String
+  date          DateTime
+  description   String
+  amount        Float    // positive = credit, negative = debit
+  type          String   // DEBIT, CREDIT
+  reference     String?
+  isReconciled  Boolean  @default(false)
+  reconciledId  String?
+  createdAt     DateTime @default(now())
+
+  bankAccount     BankAccount         @relation(fields: [bankAccountId], references: [id])
+  reconciliation  BankReconciliation? @relation(fields: [reconciledId], references: [id])
+}
+
+model BankReconciliation {
+  id              String   @id @default(cuid())
+  bankAccountId   String
+  period          String   // e.g. "2026-01"
+  statementBalance Float
+  bookBalance      Float
+  status          String   @default("OPEN") // OPEN, CLOSED
+  notes           String?
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+
+  bankAccount   BankAccount       @relation(fields: [bankAccountId], references: [id])
+  transactions  BankTransaction[]
+}
+
+// ==================== PRODUCTION COSTS (COSTOS DE PRODUCCIÓN) ====================
+model ProductionOrder {
+  id          String   @id @default(cuid())
+  number      String
+  product     String
+  quantity    Float
+  startDate   DateTime
+  endDate     DateTime?
+  status      String   @default("OPEN") // OPEN, IN_PROGRESS, CLOSED
+  totalCost   Float    @default(0)
+  companyId   String
+  createdAt   DateTime @default(now())
+
+  company     Company          @relation(fields: [companyId], references: [id])
+  costs       ProductionCost[]
+}
+
+model ProductionCost {
+  id          String   @id @default(cuid())
+  orderId     String
+  type        String   // MATERIAL, LABOR, OVERHEAD
+  description String
+  quantity    Float    @default(1)
+  unitCost    Float
+  total       Float
+  date        DateTime @default(now())
+
+  order       ProductionOrder @relation(fields: [orderId], references: [id])
+}
+
+// ==================== PERIOD CLOSING (CIERRE CONTABLE) ====================
+model ClosingPeriod {
+  id          String   @id @default(cuid())
+  period      String   // e.g. "2026-01"
+  status      String   @default("OPEN") // OPEN, CLOSED
+  closedAt    DateTime?
+  closedBy    String?
+  notes       String?
+  companyId   String
+  createdAt   DateTime @default(now())
+
+  company     Company        @relation(fields: [companyId], references: [id])
+  entries     JournalEntry[]
+
+  @@unique([period, companyId])
+}
+
+// ==================== SYSTEM & SECURITY ====================
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  companyId   String?
+  action      String   // CREATE, UPDATE, DELETE, LOGIN, etc.
+  entity      String   // JournalEntry, Invoice, etc.
+  entityId    String?
+  details     String?  // JSON string with before/after
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id])
+  company     Company? @relation(fields: [companyId], references: [id])
+}
+
+model SystemConfig {
+  id                   String   @id @default(cuid())
+  companyId            String   @unique
+  invoicePrefix        String   @default("FAC")
+  invoiceNextNumber    Int      @default(1)
+  defaultTaxRate       Float    @default(0.19)
+  defaultPaymentDays   Int      @default(30)
+  autoDepreciation     Boolean  @default(false)
+  autoClosing          Boolean  @default(false)
+  backupEnabled        Boolean  @default(true)
+  twoFactorRequired    Boolean  @default(false)
+  updatedAt            DateTime @updatedAt
+
+  company              Company @relation(fields: [companyId], references: [id])
+}
+
+model Integration {
+  id          String   @id @default(cuid())
+  companyId   String
+  type        String   // PAYMENT_GATEWAY, CRM, INVENTORY, SALES
+  name        String
+  config      String?  // JSON with API keys/config
+  isActive    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  company     Company @relation(fields: [companyId], references: [id])
+}
+
+// ==================== INVENTORY & KARDEX (INVENTARIOS) ====================
+model Warehouse {
+  id          String   @id @default(cuid())
+  code        String
+  name        String
+  location    String?
+  manager     String?
+  capacityM3  Float    @default(0)
+  companyId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company         Company          @relation(fields: [companyId], references: [id])
+  movementsOrigin KardexMovement[] @relation("OriginWarehouse")
+  movementsTarget KardexMovement[] @relation("TargetWarehouse")
+
+  @@unique([code, companyId])
+}
+
+model InventoryItem {
+  id           String   @id @default(cuid())
+  sku          String
+  name         String
+  category     String   // MATERIA_PRIMA, PRODUCTO_TERMINADO, MERCANCIA_COMERCIAL
+  unit         String   @default("UND") // UND, KG, MTR, LITRO
+  minStock     Float    @default(0)
+  maxStock     Float    @default(0)
+  standardCost Float    @default(0)
+  salePrice    Float    @default(0)
+  companyId    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  company      Company          @relation(fields: [companyId], references: [id])
+  movements    KardexMovement[]
+
+  @@unique([sku, companyId])
+}
+
+model KardexMovement {
+  id                String   @id @default(cuid())
+  date              DateTime @default(now())
+  type              String   // IN, OUT, TRANSFER
+  reason            String   // COMPRA, PRODUCCION, VENTA, CONSUMO_INTERNO, TRASLADO, AJUSTE
+  warehouseId       String
+  targetWarehouseId String?
+  itemId            String
+  quantity          Float
+  unitCost          Float
+  totalCost         Float
+  balanceQty        Float
+  balanceAvgCost    Float
+  balanceTotalValue Float
+  referenceDoc      String
+  notes             String?
+  companyId         String
+  createdAt         DateTime @default(now())
+
+  company         Company        @relation(fields: [companyId], references: [id])
+  warehouse       Warehouse      @relation("OriginWarehouse", fields: [warehouseId], references: [id])
+  targetWarehouse Warehouse?     @relation("TargetWarehouse", fields: [targetWarehouseId], references: [id])
+  item            InventoryItem  @relation(fields: [itemId], references: [id])
+}
+
