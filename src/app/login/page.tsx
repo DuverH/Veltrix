@@ -8,7 +8,7 @@ import { PieChart, Lock, Mail } from "lucide-react";
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("admin@erp.com");
-  const [password, setPassword] = useState("admin");
+  const [password, setPassword] = useState("Admin2026!*");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -115,6 +115,20 @@ export default function LoginPage() {
           <button type="submit" className="premium-btn" style={{ width: "100%", justifyContent: "center" }} disabled={loading}>
             {loading ? "Iniciando..." : "Iniciar Sesión"}
           </button>
+
+          <div style={{
+            marginTop: "1.5rem",
+            padding: "0.75rem",
+            borderRadius: "0.5rem",
+            background: "rgba(255, 255, 255, 0.04)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            fontSize: "0.8rem",
+            textAlign: "center",
+            color: "var(--secondary-foreground)"
+          }}>
+            <p style={{ fontWeight: 600, color: "var(--foreground)", marginBottom: "0.25rem" }}>Credenciales Demo / Admin:</p>
+            <p style={{ fontFamily: "monospace" }}>admin@erp.com &bull; Admin2026!*</p>
+          </div>
         </form>
       </div>
     </div>

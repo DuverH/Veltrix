@@ -8,8 +8,8 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ req, token }) => {
-        // Permitir siempre la ruta de autenticación
-        if (req.nextUrl.pathname.startsWith("/api/auth")) {
+        // Permitir siempre la ruta de autenticación y comprobación de salud
+        if (req.nextUrl.pathname.startsWith("/api/auth") || req.nextUrl.pathname === "/api/health") {
           return true;
         }
 
@@ -30,6 +30,6 @@ export default withAuth(
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/api/((?!auth).*)"
+    "/api/((?!auth|health).*)"
   ],
 };
