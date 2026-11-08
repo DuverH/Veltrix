@@ -1,4 +1,4 @@
-# Veltrix ERP · Sistema Contable, Financiero & Tributario NIIF
+# Veltrix ERP · Sistema Contable, Financiero & Tributario
 
 <p align="center">
   <strong>Plataforma integral en la nube para la gestión contable, nómina electrónica, facturación DIAN, tesorería, inventarios y activos fijos bajo normativa colombiana (NIIF / DIAN).</strong>
