@@ -1,6 +1,6 @@
 /**
  * @file ai-accounting-service.ts
- * @description Servicio de Inteligencia Artificial Contable & Copilot NIIF para Veltrix ERP.
+ * @description Servicio de Automatización Contable & Reglas Heurísticas NIIF para Veltrix ERP.
  *
  * Módulos y capacidades implementadas:
  *   1. **Clasificación Predictiva PUC**: Asignación automática de cuentas contables según conceptos y normatividad colombiana.
@@ -351,12 +351,12 @@ export class AIAccountingService {
   /**
    * Genera una propuesta de asiento contable de partida doble a partir de una descripción en lenguaje natural.
    */
-  static async generateNaturalEntry(companyId: string, prompt: string) {
-    const p = prompt.toLowerCase();
+  static async generateNaturalEntry(companyId: string, text: string) {
+    const p = text.toLowerCase();
 
     // 1. Extraer monto numérico del texto
     let amount = 1000000; // default
-    const cleanNumbers = prompt.replace(/\./g, "").match(/(?:\$|\s|^)([0-9]{4,12})/);
+    const cleanNumbers = text.replace(/\./g, "").match(/(?:\$|\s|^)([0-9]{4,12})/);
     if (cleanNumbers && cleanNumbers[1]) {
       amount = parseFloat(cleanNumbers[1]);
     } else {
@@ -383,7 +383,7 @@ export class AIAccountingService {
     let debitAccountName = "Otros Gastos Diversos";
     let creditAccountCode = "111005";
     let creditAccountName = "Bancos Moneda Nacional";
-    let description = prompt;
+    let description = text;
     let reasoning = "Se identificó un gasto operacional cancelado mediante transferencia bancaria.";
 
     // Heurísticas contables por intención
@@ -453,7 +453,7 @@ export class AIAccountingService {
         accountId: debitAcc.id,
         code: debitAcc.code,
         name: debitAcc.name,
-        description: prompt.slice(0, 80),
+        description: text.slice(0, 80),
         debit: amount,
         credit: 0,
       },
@@ -468,8 +468,8 @@ export class AIAccountingService {
     ];
 
     return {
-      description: `Asiento IA: ${prompt.slice(0, 100)}`,
-      reference: `AI-${Date.now().toString().slice(-6)}`,
+      description: `Asiento Automático: ${text.slice(0, 100)}`,
+      reference: `AUTO-${Date.now().toString().slice(-6)}`,
       amount,
       reasoning,
       isBalanced: true,
@@ -478,7 +478,7 @@ export class AIAccountingService {
   }
 
   /**
-   * Diagnóstico y Auditoría Autónoma de Anomalías Contables mediante IA
+   * Diagnóstico y Auditoría Autónoma de Anomalías Contables mediante Algoritmos NIIF
    */
   static async auditAnomalies(companyId: string) {
     const accounts = await prisma.account.findMany({

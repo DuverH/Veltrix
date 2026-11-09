@@ -2,7 +2,7 @@
 
 /**
  * @file page.tsx
- * @description Centro de Inteligencia Artificial Contable & Copilot NIIF (Veltrix AI).
+ * @description Centro de Automatización Contable & Asistente NIIF (Veltrix).
  *
  * Módulo de asistencia contable y financiera con interfaz moderna, botones separados,
  * campo de texto rectangular espacioso y compatibilidad total con Modo Oscuro OLED (#000000).
@@ -159,7 +159,7 @@ TOTAL FACTURA: $ 4.165.000`
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
   // ─── Estados: Tab 3 (Causación en Lenguaje Natural) ──────────────────────────
-  const [naturalPrompt, setNaturalPrompt] = useState(
+  const [naturalText, setNaturalText] = useState(
     "Pagamos $4.500.000 de arrendamiento de la oficina piso 3 por transferencia bancaria Bancolombia"
   );
   const [naturalResult, setNaturalResult] = useState<NaturalEntryData | null>(null);
@@ -213,7 +213,7 @@ TOTAL FACTURA: $ 4.165.000`
     },
   ];
 
-  // ─── Prompts de Ejemplo para Lenguaje Natural ────────────────────────────────
+  // ─── Ejemplos de Transacciones en Lenguaje Natural ──────────────────────────
   const naturalPresets = [
     {
       title: "Arrendamiento de Inmueble",
@@ -331,23 +331,23 @@ TOTAL FACTURA: $ 4.165.000`
   };
 
   /**
-   * Genera la propuesta de partida doble por prompt en lenguaje natural
+   * Genera la propuesta de partida doble a partir de lenguaje natural
    */
   const handleGenerateNaturalEntry = async () => {
-    if (!naturalPrompt.trim()) return;
+    if (!naturalText.trim()) return;
     try {
       setNaturalLoading(true);
       setNaturalSuccess(null);
       const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "natural_entry", prompt: naturalPrompt }),
+        body: JSON.stringify({ action: "natural_entry", text: naturalText }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setNaturalResult(data.data);
     } catch (err: any) {
-      alert("Error al procesar prompt: " + err.message);
+      alert("Error al procesar la transacción: " + err.message);
     } finally {
       setNaturalLoading(false);
     }
@@ -415,13 +415,13 @@ TOTAL FACTURA: $ 4.165.000`
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              Veltrix Neural Engine v2.4 • Activo & Conectado al PUC
+              Motor de Automatización Contable & Reglas NIIF • Activo
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-3 text-foreground">
               <span className="p-2.5 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-md">
                 <Sparkles size={24} />
               </span>
-              Inteligencia Artificial Contable & Copilot NIIF
+              Automatización Inteligente Contable & Asistente NIIF
             </h1>
             <p className="text-muted-foreground text-sm max-w-2xl leading-relaxed">
               Extracción automatizada de facturas, causación instantánea con partida doble y asesoría financiera estratégica en tiempo real.
@@ -772,7 +772,7 @@ TOTAL FACTURA: $ 4.165.000`
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════ */}
-      {/* PESTAÑA 2: DIRECTOR FINANCIERO VIRTUAL (AI CFO COPILOT)               */}
+      {/* PESTAÑA 2: ASESOR FINANCIERO AUTOMATIZADO (CFO)                        */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {activeTab === "cfo" && (
         <div className="space-y-6">
@@ -947,10 +947,10 @@ TOTAL FACTURA: $ 4.165.000`
               </div>
               <div>
                 <h2 className="text-lg font-bold text-foreground">
-                  Generador de Asientos Contables por Prompt Natural
+                  Generador de Asientos Contables en Lenguaje Natural
                 </h2>
                 <p className="text-xs text-muted-foreground">
-                  Escribe en lenguaje cotidiano lo que ocurrió en tu empresa y la red neuronal estructurará el comprobante bajo NIIF.
+                  Describe en lenguaje cotidiano la transacción ocurrida y el motor estructurará el comprobante contable bajo NIIF.
                 </p>
               </div>
             </div>
@@ -965,7 +965,7 @@ TOTAL FACTURA: $ 4.165.000`
                   <button
                     key={idx}
                     onClick={() => {
-                      setNaturalPrompt(preset.text);
+                      setNaturalText(preset.text);
                       setNaturalResult(null);
                       setNaturalSuccess(null);
                     }}
@@ -988,17 +988,17 @@ TOTAL FACTURA: $ 4.165.000`
             {/* Campo de Entrada Rectangular Amplio */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground block">
-                Instrucción en Lenguaje Natural:
+                Descripción de la Transacción:
               </label>
               <div className="ai-editor-wrapper">
                 <div className="ai-editor-header">
-                  <span>Prompt de Transacción Económica</span>
+                  <span>Descripción Económica</span>
                   <span>Motor NIIF Partida Doble</span>
                 </div>
                 <textarea
                   rows={4}
-                  value={naturalPrompt}
-                  onChange={(e) => setNaturalPrompt(e.target.value)}
+                  value={naturalText}
+                  onChange={(e) => setNaturalText(e.target.value)}
                   className="ai-textarea-rectangular"
                   style={{ minHeight: "130px", height: "130px" }}
                   placeholder="Ej: Pagamos $2.500.000 por concepto de servicio técnico de servidores con cheque..."
@@ -1008,7 +1008,7 @@ TOTAL FACTURA: $ 4.165.000`
 
             <button
               onClick={handleGenerateNaturalEntry}
-              disabled={naturalLoading || !naturalPrompt.trim()}
+              disabled={naturalLoading || !naturalText.trim()}
               className="ai-action-btn-large"
               style={{ width: "auto" }}
             >

@@ -44,11 +44,11 @@ yarn-error.log*
 *.sqlite3
 dev.db
 
-# IDE & local agent configs
-.agents/
-.windsurf/
-.claude/
+# IDE & editor files
 .vscode/
+.idea/
+*.swp
+*.swo
 
 # vercel
 .vercel

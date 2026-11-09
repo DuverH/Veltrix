@@ -151,16 +151,16 @@ Centro neurálgico contable bajo NIIF. Administra el catálogo PUC colombiano a 
 
 ---
 
-## Módulo 3: Asistente IA Contable, OCR & Copilot NIIF
+## Módulo 3: Automatización Contable, OCR & Asistente NIIF
 
 * **Ruta de acceso**: `/dashboard/ai-assistant`
 * **Archivos clave**:
   - Vista: `src/app/dashboard/ai-assistant/page.tsx`
   - API: `src/app/api/ai/route.ts`
-  - Servicio de Inteligencia Artificial: `src/lib/ai/ai-accounting-service.ts`
+  - Servicio de Automatización e Inferencia: `src/lib/ai/ai-accounting-service.ts`
 
 ### Propósito
-Automatiza integralmente la causación de compras, la consulta analítica ejecutiva y la generación de asientos contables mediante redes neuronales, modelos predictivos del PUC colombiano y heurísticas tributarias NIIF/DIAN.
+Automatiza integralmente la causación de compras, la consulta analítica ejecutiva y la generación de asientos contables mediante reglas de inferencia, modelos algorítmicos predictivos del PUC colombiano y heurísticas tributarias NIIF/DIAN.
 
 ### Características y Funcionalidades por Pestaña
 
@@ -171,7 +171,7 @@ Automatiza integralmente la causación de compras, la consulta analítica ejecut
 * **Liquidación Tributaria Exacta**: Calcula Subtotal, IVA Descontable del 19% (+), Retención en la Fuente del 2.5% (-) y el Saldo Neto en Cuentas por Pagar (CXP).
 * **Contabilización en 1 Clic**: Guarda el asiento en el Libro Diario (`JournalEntry`) y crea la factura de compra (`Invoice PAYABLE`).
 
-#### 2. Director Financiero Virtual (AI CFO Copilot)
+#### 2. Asesor Financiero Automatizado (CFO)
 * **Métricas en Vivo**: Consulta en tiempo real de Efectivo disponible (Cuentas 11), Margen Operativo Neto y Razón Corriente de Solvencia.
 * **Consultas Financieras en Lenguaje Natural**:
   - *"¿Cuál es mi liquidez y solvencia?"*: Retorna el balance de tesorería y la razón corriente de respaldo ante pasivos inmediatos.
@@ -180,17 +180,17 @@ Automatiza integralmente la causación de compras, la consulta analítica ejecut
   - *"¿Cuál es el estado de la cartera de clientes?"*: Resume cuentas por cobrar y recomienda estrategias de recaudo.
 
 #### 3. Causación en Lenguaje Natural
-* **Generación de Asientos por Prompt**: Permite redactar lo que ocurrió (ej. *"Pagamos $4.500.000 de arrendamiento de la oficina por transferencia Bancolombia"*).
-* **Estructuración de Partida Doble**: La IA analiza el concepto, busca o crea las cuentas correspondientes en el PUC de la empresa y estructura la tabla con Débitos y Créditos balanceados ($\sum \text{Débitos} = \sum \text{Créditos}$).
+* **Generación de Asientos por Lenguaje Natural**: Permite redactar lo que ocurrió (ej. *"Pagamos $4.500.000 de arrendamiento de la oficina por transferencia Bancolombia"*).
+* **Estructuración de Partida Doble**: El motor analiza el concepto, busca o crea las cuentas correspondientes en el PUC de la empresa y estructura la tabla con Débitos y Créditos balanceados ($\sum \text{Débitos} = \sum \text{Créditos}$).
 * **Asentamiento Inmediato**: Un botón permite validar y postear directamente al Libro Diario general sin digitar comprobantes manualmente.
 
-#### 4. Auditor Neuronal de Riesgos & Anomalías
+#### 4. Auditor Algorítmico de Riesgos & Anomalías
 * **Detección Preventiva**: Escanea los saldos de todas las cuentas activas detectando saldos en rojo en bancos/caja y facturas de clientes vencidas sin cobro.
 * **Índice de Confiabilidad**: Puntaje de salud de 0 a 100 con acciones sugeridas para optimización fiscal y de tesorería.
 
 ### Modificación Técnica y Extensión
 * **Añadir Nuevas Reglas de Clasificación**: En `src/lib/ai/ai-accounting-service.ts`, modificar el método `predictPucAccount(text: string)`.
-* **Conectar un Modelo de Lenguaje Externo (ej. Gemini o OpenAI)**: En `src/lib/ai/ai-accounting-service.ts`, sustituir o extender las funciones `parseInvoiceText` o `queryCfoBot` consumiendo la API de inferencia deseada.
+* **Conectar Motores Externos de Inferencia o Reconocimiento**: En `src/lib/ai/ai-accounting-service.ts`, sustituir o extender las funciones `parseInvoiceText` o `queryCfoBot` consumiendo servicios REST de procesamiento o servicios cloud de inferencia.
 
 ---
 

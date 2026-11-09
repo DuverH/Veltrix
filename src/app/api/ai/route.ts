@@ -6,7 +6,7 @@
  *   - `ocr_parse`: Extracción y clasificación automática de facturas de compra (OCR / UBL 2.1).
  *   - `post_ocr_invoice`: Asienta la factura procesada en el Libro Diario y registra la Cuenta por Pagar.
  *   - `cfo_query`: Consulta analítica en lenguaje natural al Director Financiero Virtual (AI CFO).
- *   - `natural_entry`: Generación de propuesta de asiento contable de partida doble por prompt.
+ *   - `natural_entry`: Generación de propuesta de asiento contable de partida doble en lenguaje natural.
  *   - `post_natural_entry`: Registra el asiento contable propuesto en el Libro Diario.
  *   - `audit_anomalies`: Escaneo proactivo de anomalías contables y riesgos de evasión.
  */
@@ -49,8 +49,8 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "natural_entry") {
-      const { prompt } = body;
-      const result = await AIAccountingService.generateNaturalEntry(company.id, prompt || "");
+      const text = body.text || body.description || "";
+      const result = await AIAccountingService.generateNaturalEntry(company.id, text);
       return NextResponse.json({ success: true, data: result });
     }
 
