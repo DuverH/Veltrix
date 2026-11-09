@@ -516,17 +516,17 @@ export default function SettingsPage() {
                 padding: "1rem 1.5rem",
                 borderRadius: "var(--radius)",
                 border: `2px solid ${theme === "dark" ? "var(--primary)" : "var(--border)"}`,
-                background: theme === "dark" ? "rgba(129, 140, 248, 0.12)" : "var(--background)",
+                background: theme === "dark" ? "rgba(99, 102, 241, 0.2)" : "var(--background)",
                 color: "var(--foreground)",
                 cursor: "pointer",
                 transition: "all 0.2s ease",
-                minWidth: "120px",
+                minWidth: "140px",
                 fontWeight: theme === "dark" ? 700 : 400,
               }}
             >
-              {/* Luna (modo oscuro) */}
+              {/* Luna (modo oscuro OLED) */}
               <span style={{ fontSize: "1.5rem" }}>🌙</span>
-              <span style={{ fontSize: "0.875rem" }}>Modo Oscuro</span>
+              <span style={{ fontSize: "0.875rem" }}>Oscuro Puro (OLED)</span>
               {theme === "dark" && (
                 <span
                   style={{

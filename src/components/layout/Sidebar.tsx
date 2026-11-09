@@ -1,22 +1,21 @@
 /**
  * @file Sidebar.tsx
- * @description Barra lateral de navegación de Veltrix ERP.
+ * @description Barra lateral de navegación principal categorizada de Veltrix ERP.
  *
- * Renderiza:
- *   - Logo / nombre de la aplicación en la parte superior.
- *   - Lista de elementos de navegación principal (módulos del ERP).
- *   - Acciones de sesión en la parte inferior: Configuración y Cerrar sesión.
- *
- * La clase `active` se determina comparando `pathname` (ruta actual) con
- * el `href` de cada elemento, de modo que el resaltado siempre refleja
- * la página en la que se encuentra el usuario.
- *
- * El Sidebar hereda el tema activo a través de los tokens CSS definidos
- * en `globals.css`; no necesita importar `useTheme` directamente.
+ * Características:
+ *   - Integra el logotipo vectorial oficial de Veltrix.
+ *   - Agrupación semántica intuitiva en 4 secciones funcionales:
+ *     1. **PANEL PRINCIPAL** (Resumen ejecutivo e IA)
+ *     2. **CONTABILIDAD & NIIF** (Operaciones de libro diario, bancos, activos y cierres)
+ *     3. **OPERACIÓN & COMERCIAL** (Facturación DIAN, tesorería, nómina e inventarios)
+ *     4. **REPORTES & CONTROL** (Estados financieros y auditoría SHA-256)
+ *   - Resaltado de la ruta activa con micro-interacciones suaves.
+ *   - Pie con accesos directos a configuración, cierre de sesión y badge de estado.
  */
 
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -37,19 +36,23 @@ import {
   Sparkles,
   TrendingUp,
   LogOut,
+  HelpCircle,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { VeltrixLogo } from "@/components/ui/VeltrixLogo";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-/** Definición de un elemento de navegación en el sidebar */
 interface NavItem {
-  /** Texto mostrado al usuario */
   name: string;
-  /** Ruta interna de Next.js */
   href: string;
-  /** Componente de ícono de lucide-react */
-  icon: React.ComponentType<{ size?: number }>;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  badge?: string;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItem[];
 }
 
 // ─── Componente ───────────────────────────────────────────────────────────────
@@ -57,107 +60,119 @@ interface NavItem {
 /**
  * `Sidebar`
  *
- * Barra lateral persistente en todas las páginas del dashboard.
- * Se instancia en `src/app/dashboard/layout.tsx`.
+ * Barra de navegación izquierda con agrupación jerárquica intuitiva.
  */
 export function Sidebar() {
-  /** Ruta actual del navegador — usada para resaltar el ítem activo */
   const pathname = usePathname();
 
-  // ── Lista de módulos principales ─────────────────────────────────────────
-
-  /**
-   * Elementos de navegación principales ordenados por flujo contable:
-   * Dashboard → Contabilidad → Módulos operativos → Reportes → Configuración.
-   */
-  const coreNavItems: NavItem[] = [
-    { name: "Dashboard",                   href: "/dashboard",                       icon: LayoutDashboard },
-    { name: "Libro Diario & PUC",          href: "/dashboard/accounting",            icon: BookOpen       },
-    { name: "IA Contable & OCR",           href: "/dashboard/ai-assistant",          icon: Sparkles       },
-    { name: "Nómina Electrónica",          href: "/dashboard/payroll",               icon: Briefcase      },
-    { name: "Inventarios & Kardex",        href: "/dashboard/inventory",             icon: Boxes          },
-    { name: "Tesorería & Flujo Caja",      href: "/dashboard/treasury",              icon: TrendingUp     },
-    { name: "Conciliación Bancos",         href: "/dashboard/accounting/bank",       icon: RefreshCcw     },
-    { name: "Costos de Producción",        href: "/dashboard/accounting/production", icon: Layers         },
-    { name: "Cierres Contables",           href: "/dashboard/accounting/closing",    icon: Lock           },
-    { name: "Préstamos & Amortización",    href: "/dashboard/accounting/loans",      icon: Landmark       },
-    { name: "Estados Financieros",         href: "/dashboard/reports",               icon: PieChart       },
-    { name: "Facturación & DSE",           href: "/dashboard/billing",               icon: FileText       },
-    { name: "Terceros (Clientes/Prov)",    href: "/dashboard/contacts",              icon: Users          },
-    { name: "Activos Fijos",              href: "/dashboard/assets",                icon: Building       },
-    { name: "Auditoría Inmutable",         href: "/dashboard/audit",                 icon: Shield         },
+  // ── Estructura jerárquica del menú ─────────────────────────────────────────
+  const navigationSections: NavSection[] = [
+    {
+      title: "Panel Principal",
+      items: [
+        { name: "Dashboard Ejecutivo", href: "/dashboard", icon: LayoutDashboard },
+        { name: "IA Contable & OCR", href: "/dashboard/ai-assistant", icon: Sparkles, badge: "AI" },
+      ],
+    },
+    {
+      title: "Contabilidad & NIIF",
+      items: [
+        { name: "Libro Diario & PUC", href: "/dashboard/accounting", icon: BookOpen },
+        { name: "Conciliación Bancos", href: "/dashboard/accounting/bank", icon: RefreshCcw },
+        { name: "Cierres Contables", href: "/dashboard/accounting/closing", icon: Lock },
+        { name: "Préstamos & Amortización", href: "/dashboard/accounting/loans", icon: Landmark },
+        { name: "Activos Fijos", href: "/dashboard/assets", icon: Building },
+        { name: "Costos de Producción", href: "/dashboard/accounting/production", icon: Layers },
+      ],
+    },
+    {
+      title: "Operación & Comercial",
+      items: [
+        { name: "Facturación & DSE (DIAN)", href: "/dashboard/billing", icon: FileText },
+        { name: "Tesorería & Flujo Caja", href: "/dashboard/treasury", icon: TrendingUp },
+        { name: "Inventarios & Kardex", href: "/dashboard/inventory", icon: Boxes },
+        { name: "Nómina Electrónica", href: "/dashboard/payroll", icon: Briefcase },
+        { name: "Terceros (Clientes/Prov)", href: "/dashboard/contacts", icon: Users },
+      ],
+    },
+    {
+      title: "Informes & Control",
+      items: [
+        { name: "Estados Financieros NIIF", href: "/dashboard/reports", icon: PieChart },
+        { name: "Auditoría Inmutable", href: "/dashboard/audit", icon: Shield },
+      ],
+    },
   ];
 
-  // ── Render ───────────────────────────────────────────────────────────────
-
   return (
-    /*
-     * El sidebar usa `overflowY: "auto"` para permitir desplazamiento vertical
-     * cuando el contenido excede la altura disponible (pantallas pequeñas).
-     */
-    <div className="sidebar" style={{ overflowY: "auto" }}>
-
-      {/* ── Logo y nombre de la aplicación ──────────────────────────────── */}
+    <aside className="sidebar" aria-label="Navegación principal">
+      {/* ── 1. Logotipo oficial de la marca Veltrix ─────────────────────────── */}
       <div className="sidebar-logo">
-        {/* Ícono de marca */}
-        <PieChart size={28} />
-        {/* Nombre de la aplicación con fuente en negrita y kerning ajustado */}
-        <span style={{ fontWeight: 800, letterSpacing: "-0.02em" }}>
-          Veltrix
-        </span>
+        <Link href="/dashboard" style={{ textDecoration: "none" }}>
+          <VeltrixLogo size="md" showBadge={true} badgeText="ERP" />
+        </Link>
       </div>
 
-      {/* ── Navegación principal ─────────────────────────────────────────── */}
-      <div style={{ flex: 1 }}>
-        {coreNavItems.map((item) => {
-          const Icon = item.icon;
+      {/* ── 2. Lista de navegación categorizada con scroll ─────────────────── */}
+      <div style={{ flex: 1, overflowY: "auto", paddingRight: "4px" }}>
+        {navigationSections.map((section, idx) => (
+          <div key={section.title} style={{ marginBottom: "0.85rem" }}>
+            <div className="nav-section-title">{section.title}</div>
 
-          /*
-           * Comparación exacta de rutas para resaltar el ítem activo.
-           * Se usa `===` y no `startsWith` para evitar que rutas padre
-           * aparezcan activas cuando se navega a un hijo.
-           */
-          const isActive = pathname === item.href;
+            {section.items.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`nav-item ${isActive ? "active" : ""}`}
-              /* Accesibilidad: indica la página actual al lector de pantalla */
-              aria-current={isActive ? "page" : undefined}
-            >
-              {/* Ícono del módulo */}
-              <Icon size={18} aria-hidden="true" />
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`nav-item ${isActive ? "active" : ""}`}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <Icon size={17} />
+                  <span style={{ flex: 1 }}>{item.name}</span>
 
-              {/* Nombre del módulo */}
-              <span style={{ fontSize: "0.85rem" }}>{item.name}</span>
-            </Link>
-          );
-        })}
+                  {item.badge && (
+                    <span
+                      style={{
+                        fontSize: "0.65rem",
+                        padding: "1px 5px",
+                        borderRadius: "4px",
+                        fontWeight: 700,
+                        background: isActive
+                          ? "rgba(255, 255, 255, 0.25)"
+                          : "rgba(99, 102, 241, 0.15)",
+                        color: isActive ? "#ffffff" : "var(--primary)",
+                      }}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </div>
 
-      {/* ── Acciones de sesión (parte inferior) ─────────────────────────── */}
+      {/* ── 3. Acciones de sesión y utilidades (Footer) ────────────────────── */}
       <div
         style={{
           marginTop: "auto",
-          paddingTop: "1rem",
+          paddingTop: "0.85rem",
           borderTop: "1px solid var(--border)",
         }}
       >
-        {/* Enlace a la página de Configuración */}
         <Link
           href="/dashboard/settings"
-          className={`nav-item ${
-            pathname === "/dashboard/settings" ? "active" : ""
-          }`}
+          className={`nav-item ${pathname === "/dashboard/settings" ? "active" : ""}`}
           aria-current={pathname === "/dashboard/settings" ? "page" : undefined}
         >
-          <Settings size={18} aria-hidden="true" />
-          <span style={{ fontSize: "0.85rem" }}>Configuración</span>
+          <Settings size={17} />
+          <span>Configuración</span>
         </Link>
 
-        {/* Botón de cierre de sesión — llama a NextAuth signOut */}
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
           className="nav-item"
@@ -168,12 +183,38 @@ export function Sidebar() {
             border: "none",
             cursor: "pointer",
             textAlign: "left",
+            color: "var(--destructive)",
           }}
         >
-          <LogOut size={18} aria-hidden="true" />
-          <span style={{ fontSize: "0.85rem" }}>Cerrar Sesión</span>
+          <LogOut size={17} />
+          <span>Cerrar Sesión</span>
         </button>
+
+        {/* Indicador de versión y estado del sistema */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0.4rem 0.75rem 0 0.75rem",
+            fontSize: "0.7rem",
+            color: "var(--secondary-foreground)",
+          }}
+        >
+          <span>Veltrix v0.1.0</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <span
+              style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "50%",
+                background: "var(--success)",
+              }}
+            />
+            En línea
+          </span>
+        </div>
       </div>
-    </div>
+    </aside>
   );
 }

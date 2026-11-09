@@ -5,121 +5,124 @@
  *
  * Estrategia de temas:
  *   - El tema claro es el predeterminado (:root).
- *   - El tema oscuro se activa añadiendo la clase `.dark` al elemento
- *     <html>; esto permite cambiar el tema sin recargar la página y
- *     persiste la preferencia del usuario via localStorage.
- *   - Se incluye también el media query `prefers-color-scheme: dark`
- *     como capa de compatibilidad para usuarios que nunca hayan
- *     interactuado con el toggle manual.
+ *   - El tema oscuro (.dark) está diseñado como "OLED / Pitch Black"
+ *     completamente oscuro (#000000 / #090a0f), optimizado para máxima
+ *     inmersión, contraste superior y ahorro de energía en pantallas modernas.
+ *   - Se activa añadiendo la clase `.dark` al elemento <html>; persiste
+ *     en localStorage via ThemeProvider.
  *
- * Convención de nombres:
- *   --foreground   → color de texto principal
- *   --background   → fondo de la página
- *   --card         → fondo de tarjetas / paneles elevados
- *   --border       → color de bordes y separadores
- *   --primary      → color de acción/marca
- *   --secondary    → fondo de elementos secundarios
- *   --destructive  → color de errores y acciones destructivas
- *   --success      → color de confirmaciones y valores positivos
+ * Convención de tokens:
+ *   --foreground           → color de texto principal
+ *   --background           → fondo base de la aplicación
+ *   --card                 → superficie de tarjetas y paneles
+ *   --card-border          → borde específico para tarjetas
+ *   --border               → separadores y contornos generales
+ *   --secondary            → fondos neutros / inputs secundarios
+ *   --secondary-foreground → texto secundario / metadatos
+ *   --primary              → color principal de marca y foco
+ *   --primary-hover        → interacción de marca
+ *   --accent               → resaltados complementarios
+ *   --success              → aprobaciones, créditos positivos, ganancias
+ *   --destructive          → alertas, débitos de gasto, cancelaciones
  * ============================================================
  */
 
-/* ─── Tema claro (predeterminado) ───────────────────────────────────────────── */
+/* ─── Tema Claro ────────────────────────────────────────────────────────────── */
 :root {
-  /* Superficie base de la aplicación */
   --background: #f8fafc;
   --foreground: #0f172a;
 
-  /* Color de marca principal */
   --primary: #4f46e5;
   --primary-hover: #4338ca;
   --primary-foreground: #ffffff;
+  --primary-glow: rgba(79, 70, 229, 0.25);
 
-  /* Elementos secundarios y fondos sutiles */
-  --secondary: #e2e8f0;
-  --secondary-foreground: #475569;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #64748b;
 
-  /* Color de acento para highlights */
-  --accent: #38bdf8;
+  --accent: #0ea5e9;
   --accent-foreground: #ffffff;
 
-  /* Acciones destructivas y errores */
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  /* Confirmaciones y valores positivos */
-  --success: #22c55e;
+  --success: #10b981;
+  --warning: #f59e0b;
 
-  /* Tarjetas y paneles elevados */
   --card: #ffffff;
   --card-foreground: #0f172a;
+  --card-border: #e2e8f0;
 
-  /* Bordes, inputs y anillos de foco */
   --border: #e2e8f0;
   --input: #e2e8f0;
   --ring: #4f46e5;
 
-  /* Radio de borde global */
   --radius: 0.75rem;
+  --radius-sm: 0.5rem;
+  --radius-lg: 1rem;
 
-  /* Tipografía base */
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-
-  /* Transición suave al cambiar de tema */
-  --theme-transition: color 0.2s ease, background-color 0.2s ease,
-    border-color 0.2s ease;
+  --theme-transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
 
-/* ─── Tema oscuro vía clase `.dark` en <html> ───────────────────────────────── */
+/* ─── Modo Completamente Oscuro (OLED Pure Black) ───────────────────────────── */
 /*
- * Se sobreescriben únicamente los tokens que cambian de valor entre temas.
- * Los valores que son iguales en ambos temas (radios, familia tipográfica,
- * colores de marca que no varían, etc.) no se repiten aquí.
+ * Diseño Pitch Black de ultra alto contraste:
+ *   - Fondo: Negro puro (#000000)
+ *   - Superficies elevadas: Carbón obsidiana (#0a0b0e / #111218)
+ *   - Bordes sutiles: Pizarra profunda (#1c1e26)
+ *   - Tipografía principal: Blanco titanio (#f9fafb)
+ *   - Acentos: Indigo eléctrico y Cyan brillante
  */
 .dark {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
+  --background: #000000;
+  --foreground: #f9fafb;
 
-  --primary: #818cf8;
-  --primary-hover: #6366f1;
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --primary-foreground: #ffffff;
+  --primary-glow: rgba(99, 102, 241, 0.35);
 
-  --secondary: #1e293b;
+  --secondary: #0d0f14;
   --secondary-foreground: #94a3b8;
 
-  --card: #1e293b;
-  --card-foreground: #f1f5f9;
+  --accent: #38bdf8;
+  --accent-foreground: #000000;
 
-  --border: #334155;
-  --input: #334155;
-  --ring: #818cf8;
+  --destructive: #f43f5e;
+  --destructive-foreground: #ffffff;
+
+  --success: #10b981;
+  --warning: #fbbf24;
+
+  --card: #08090d;
+  --card-foreground: #f9fafb;
+  --card-border: #181a22;
+
+  --border: #161822;
+  --input: #12141c;
+  --ring: #6366f1;
 }
 
-/* ─── Compatibilidad con preferencia del sistema ────────────────────────────── */
-/*
- * Este bloque aplica el tema oscuro para usuarios que:
- *   a) tienen el sistema en modo oscuro, Y
- *   b) aún no han interactuado con el toggle de Veltrix.
- * Una vez el usuario pulse el toggle, ThemeProvider escribe "light" o "dark"
- * en localStorage y controla el tema a través de la clase `.dark` en <html>,
- * ignorando este media-query.
- */
+/* ─── Compatibilidad inicial con sistema ────────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
   :root:not(.dark):not(.light) {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-    --primary: #818cf8;
-    --primary-hover: #6366f1;
-    --secondary: #1e293b;
+    --background: #000000;
+    --foreground: #f9fafb;
+    --primary: #6366f1;
+    --primary-hover: #818cf8;
+    --secondary: #0d0f14;
     --secondary-foreground: #94a3b8;
-    --card: #1e293b;
-    --card-foreground: #f1f5f9;
-    --border: #334155;
-    --input: #334155;
-    --ring: #818cf8;
+    --card: #08090d;
+    --card-foreground: #f9fafb;
+    --card-border: #181a22;
+    --border: #161822;
+    --input: #12141c;
+    --ring: #6366f1;
   }
 }
 
-/* ─── Reset y base ──────────────────────────────────────────────────────────── */
+/* ─── Reset y normalización ─────────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -128,13 +131,13 @@
   padding: 0;
 }
 
-/*
- * Transición de color global aplicada al cambio de tema.
- * Usamos `transition` en `*` con duración corta para evitar destellos
- * bruscos al alternar entre claro y oscuro.
- */
 html {
   transition: var(--theme-transition);
+  color-scheme: light dark;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body {
@@ -146,161 +149,201 @@ body {
   transition: var(--theme-transition);
 }
 
-/* ─── Estructura principal de la aplicación ─────────────────────────────────── */
-
-/* Contenedor raíz del layout (sidebar + main) */
+/* ─── Layout General ─────────────────────────────────────────────────────────── */
 .app-container {
   display: flex;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  background-color: var(--background);
 }
 
-/* ─── Sidebar ────────────────────────────────────────────────────────────────── */
+/* ─── Sidebar de Navegación ─────────────────────────────────────────────────── */
 .sidebar {
-  width: 280px;
+  width: 290px;
   background-color: var(--card);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1.25rem 1rem;
   transition: background-color 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
 }
 
-/* Logo / nombre de la marca en la parte superior del sidebar */
+.dark .sidebar {
+  background-color: #050608;
+  border-right-color: #151720;
+}
+
+/* Sección de marca y logo */
 .sidebar-logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  padding: 0.5rem 0.75rem 1.25rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
 }
 
-/* Elemento de navegación individual */
+.dark .sidebar-logo {
+  border-bottom-color: #151720;
+}
+
+/* Encabezado de categoría en el menú */
+.nav-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--secondary-foreground);
+  padding: 0.75rem 0.75rem 0.35rem 0.75rem;
+  opacity: 0.8;
+}
+
+/* Elementos de navegación interactivos */
 .nav-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius);
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
   color: var(--foreground);
   text-decoration: none;
   font-weight: 500;
-  margin-bottom: 0.5rem;
-  transition: background-color 0.2s ease, color 0.2s ease,
-    transform 0.2s ease;
+  font-size: 0.825rem;
+  margin-bottom: 0.2rem;
+  transition: all 0.15s ease;
 }
 
-/* Estado hover y estado activo (ruta actual) */
-.nav-item:hover,
+.nav-item:hover {
+  background-color: var(--secondary);
+  color: var(--foreground);
+  transform: translateX(3px);
+}
+
+.dark .nav-item:hover {
+  background-color: #12141e;
+  color: #ffffff;
+}
+
 .nav-item.active {
   background-color: var(--primary);
   color: var(--primary-foreground);
-  transform: translateX(4px);
+  font-weight: 600;
+  box-shadow: 0 2px 8px var(--primary-glow);
+  transform: translateX(3px);
 }
 
-/* ─── Área de contenido principal ───────────────────────────────────────────── */
+/* ─── Contenido Principal & Topbar ──────────────────────────────────────────── */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color: var(--background);
 }
 
-/* ─── Topbar ─────────────────────────────────────────────────────────────────── */
 .topbar {
-  height: 70px;
+  height: 68px;
   background-color: var(--card);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  padding: 0 1.75rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 50;
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-/* Área de contenido desplazable debajo del topbar */
+.dark .topbar {
+  background-color: #050608;
+  border-bottom-color: #151720;
+}
+
 .page-content {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  background-color: var(--background);
 }
 
-/* ─── Grid del dashboard ─────────────────────────────────────────────────────── */
+/* ─── Tarjetas & Paneles ─────────────────────────────────────────────────────── */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
   margin-bottom: 2rem;
 }
 
-/* ─── Tarjeta de métrica ─────────────────────────────────────────────────────── */
 .metric-card {
   background-color: var(--card);
   border-radius: var(--radius);
   padding: 1.5rem;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease,
-    background-color 0.2s ease;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Efecto elevación al hacer hover sobre la tarjeta */
+.dark .metric-card {
+  background-color: #08090d;
+  border-color: #161822;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
 .metric-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* Título/etiqueta de la métrica */
+.dark .metric-card:hover {
+  border-color: #272a38;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+}
+
 .metric-title {
   color: var(--secondary-foreground);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
 }
 
-/* Valor numérico principal de la métrica */
 .metric-value {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.85rem;
+  font-weight: 800;
   color: var(--foreground);
+  letter-spacing: -0.02em;
 }
 
-/* Indicador de tendencia (↑/↓) */
 .metric-trend {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   margin-top: 0.5rem;
+  font-weight: 500;
 }
 
-/* Tendencia positiva */
 .trend-up {
   color: var(--success);
 }
 
-/* Tendencia negativa */
 .trend-down {
   color: var(--destructive);
 }
 
-/* ─── Tabla premium ──────────────────────────────────────────────────────────── */
-
-/* Contenedor con bordes redondeados y sombra */
+/* ─── Tablas Premium ─────────────────────────────────────────────────────────── */
 .table-container {
   background-color: var(--card);
   border-radius: var(--radius);
   border: 1px solid var(--border);
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.dark .table-container {
+  background-color: #08090d;
+  border-color: #161822;
 }
 
 .premium-table {
@@ -308,168 +351,157 @@ body {
   border-collapse: collapse;
 }
 
-/* Cabecera de la tabla */
 .premium-table th {
   background-color: var(--secondary);
   color: var(--secondary-foreground);
   font-weight: 600;
   text-align: left;
-  padding: 1rem 1.5rem;
-  font-size: 0.875rem;
-  transition: background-color 0.2s ease;
-}
-
-/* Celdas de datos */
-.premium-table td {
-  padding: 1rem 1.5rem;
+  padding: 0.85rem 1.25rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   border-bottom: 1px solid var(--border);
-  font-size: 0.875rem;
-  transition: background-color 0.1s ease;
 }
 
-/*
- * Resaltado de fila al hacer hover.
- * El valor de opacidad es diferente en modo oscuro (gestionado por el token
- * --border que ya usa un tono claro sobre fondo oscuro).
- */
+.dark .premium-table th {
+  background-color: #0d0f14;
+  border-bottom-color: #181a24;
+}
+
+.premium-table td {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--foreground);
+}
+
+.dark .premium-table td {
+  border-bottom-color: #12141c;
+}
+
 .premium-table tr:hover td {
-  background-color: rgba(79, 70, 229, 0.04);
+  background-color: rgba(79, 70, 229, 0.03);
 }
 
-/* En modo oscuro el hover usa una opacidad mayor para ser perceptible */
 .dark .premium-table tr:hover td {
-  background-color: rgba(129, 140, 248, 0.08);
+  background-color: rgba(99, 102, 241, 0.06);
 }
 
-/* ─── Botón principal (premium-btn) ──────────────────────────────────────────── */
+/* ─── Botones & Controles ────────────────────────────────────────────────────── */
 .premium-btn {
   background-color: var(--primary);
   color: var(--primary-foreground);
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius);
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease,
-    box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: all 0.15s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px var(--primary-glow);
 }
 
-/* Efecto elevación al hacer hover */
 .premium-btn:hover:not(:disabled) {
   background-color: var(--primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--primary-glow);
 }
 
-/* Estado activo / presionado */
 .premium-btn:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.premium-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
   box-shadow: none;
 }
 
-/* Estado deshabilitado */
-.premium-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-/* ─── Toggle del tema (botón de modo oscuro) ─────────────────────────────────── */
-/*
- * Botón circular que muestra el ícono de sol (modo claro) o luna (modo oscuro).
- * Hereda el color de los iconos del tema activo.
- */
+/* Botón de tema circular */
 .theme-toggle-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--secondary);
   color: var(--foreground);
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease,
-    transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-/* Efecto hover del toggle de tema */
+.dark .theme-toggle-btn {
+  background: #0d0f14;
+  border-color: #1c1e28;
+  color: #fbbf24;
+}
+
 .theme-toggle-btn:hover {
   background: var(--primary);
   color: var(--primary-foreground);
   border-color: var(--primary);
-  transform: rotate(15deg) scale(1.08);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
+  transform: rotate(15deg) scale(1.05);
 }
 
-/* ─── Inputs ─────────────────────────────────────────────────────────────────── */
+/* ─── Inputs & Formularios ───────────────────────────────────────────────────── */
 .premium-input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 0.9rem;
   border: 1px solid var(--input);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   background-color: var(--background);
   color: var(--foreground);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease,
-    background-color 0.2s ease;
-  font-size: 0.9rem;
+  transition: all 0.15s ease;
+  font-size: 0.875rem;
 }
 
-/* Estado de foco del input */
+.dark .premium-input {
+  background-color: #050608;
+  border-color: #1c1e28;
+  color: #f9fafb;
+}
+
 .premium-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18);
+  box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
-/* En modo oscuro el anillo de foco usa el tono violeta claro */
-.dark .premium-input:focus {
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.25);
-}
-
-/* ─── Grupos de formulario ───────────────────────────────────────────────────── */
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
-/* Etiqueta de campo */
 .form-label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.825rem;
   color: var(--foreground);
 }
 
-/* ─── Glassmorphism ──────────────────────────────────────────────────────────── */
-/*
- * Panel con efecto de cristal esmerilado.
- * En modo claro usa blanco semi-transparente; en modo oscuro usa azul oscuro
- * semi-transparente para mantener coherencia visual.
- */
+/* ─── Glass Panels ───────────────────────────────────────────────────────────── */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: var(--radius);
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-/* Variante oscura del panel de cristal */
 .dark .glass-panel {
-  background: rgba(30, 41, 59, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(8, 9, 13, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #161822;
 }
 
-/* ─── Scrollbar personalizado ────────────────────────────────────────────────── */
-/*
- * Estilo sutil para la barra de desplazamiento en navegadores WebKit.
- * Se adapta automáticamente a través de los tokens de color.
- */
+/* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -481,62 +513,81 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 3px;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #1c1e28;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--secondary-foreground);
 }
 
-/* ─── Utilidades de texto ────────────────────────────────────────────────────── */
-
-/* Texto que respeta ambos temas automáticamente */
-.text-muted {
-  color: var(--secondary-foreground);
-}
-
-/* ─── Badges de estado ───────────────────────────────────────────────────────── */
+/* ─── Badges ─────────────────────────────────────────────────────────────────── */
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
 }
 
 .badge-success {
-  background: rgba(34, 197, 94, 0.15);
-  color: #16a34a;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
 }
 
 .dark .badge-success {
-  background: rgba(34, 197, 94, 0.2);
-  color: #4ade80;
-}
-
-.badge-destructive {
-  background: rgba(239, 68, 68, 0.15);
-  color: #dc2626;
-}
-
-.dark .badge-destructive {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
 }
 
 .badge-warning {
-  background: rgba(234, 179, 8, 0.15);
-  color: #ca8a04;
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
 }
 
 .dark .badge-warning {
-  background: rgba(234, 179, 8, 0.2);
-  color: #facc15;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.badge-destructive {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.dark .badge-destructive {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
 }
 
 .badge-neutral {
   background: var(--secondary);
   color: var(--secondary-foreground);
+}
+
+.dark .badge-neutral {
+  background: #12141c;
+  color: #94a3b8;
+}
+
+/* ─── Animaciones ────────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.15s ease-out forwards;
 }

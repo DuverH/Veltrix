@@ -20,6 +20,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   LineChart,
   Line,
@@ -40,6 +41,12 @@ import {
   Activity,
   Printer,
   RefreshCw,
+  PlusCircle,
+  FilePlus,
+  Sparkles,
+  RefreshCcw,
+  Users,
+  Building2,
 } from "lucide-react";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -214,6 +221,115 @@ export default function DashboardPage() {
             <Printer size={16} aria-hidden="true" />
             Exportar / Imprimir
           </button>
+        </div>
+      </div>
+
+      {/* ── Barra de Accesos Rápidos Intuitivos ─────────────────────────── */}
+      <div
+        className="glass-panel"
+        style={{
+          padding: "0.85rem 1.25rem",
+          borderRadius: "var(--radius)",
+          marginBottom: "1.75rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "1rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <span
+          style={{
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+            color: "var(--secondary-foreground)",
+          }}
+        >
+          Acciones Frecuentes:
+        </span>
+
+        <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", flex: 1 }}>
+          <Link
+            href="/dashboard/accounting"
+            className="premium-btn"
+            style={{
+              padding: "0.45rem 0.85rem",
+              fontSize: "0.78rem",
+              background: "var(--secondary)",
+              color: "var(--foreground)",
+              border: "1px solid var(--border)",
+              boxShadow: "none",
+            }}
+          >
+            <PlusCircle size={14} color="var(--primary)" />
+            <span>Asiento Diario</span>
+          </Link>
+
+          <Link
+            href="/dashboard/billing"
+            className="premium-btn"
+            style={{
+              padding: "0.45rem 0.85rem",
+              fontSize: "0.78rem",
+              background: "var(--secondary)",
+              color: "var(--foreground)",
+              border: "1px solid var(--border)",
+              boxShadow: "none",
+            }}
+          >
+            <FilePlus size={14} color="var(--primary)" />
+            <span>Factura DIAN</span>
+          </Link>
+
+          <Link
+            href="/dashboard/accounting/bank"
+            className="premium-btn"
+            style={{
+              padding: "0.45rem 0.85rem",
+              fontSize: "0.78rem",
+              background: "var(--secondary)",
+              color: "var(--foreground)",
+              border: "1px solid var(--border)",
+              boxShadow: "none",
+            }}
+          >
+            <RefreshCcw size={14} color="var(--success)" />
+            <span>Conciliar Bancos</span>
+          </Link>
+
+          <Link
+            href="/dashboard/payroll"
+            className="premium-btn"
+            style={{
+              padding: "0.45rem 0.85rem",
+              fontSize: "0.78rem",
+              background: "var(--secondary)",
+              color: "var(--foreground)",
+              border: "1px solid var(--border)",
+              boxShadow: "none",
+            }}
+          >
+            <Users size={14} color="var(--warning)" />
+            <span>Liquidar Nómina</span>
+          </Link>
+
+          <Link
+            href="/dashboard/ai-assistant"
+            className="premium-btn"
+            style={{
+              padding: "0.45rem 0.85rem",
+              fontSize: "0.78rem",
+              background: "rgba(99, 102, 241, 0.15)",
+              color: "var(--primary)",
+              border: "1px solid rgba(99, 102, 241, 0.3)",
+              boxShadow: "none",
+              marginLeft: "auto",
+            }}
+          >
+            <Sparkles size={14} />
+            <span>Asistente IA &bull; OCR</span>
+          </Link>
         </div>
       </div>
 

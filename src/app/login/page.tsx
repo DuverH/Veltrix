@@ -19,7 +19,8 @@
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { PieChart, Lock, Mail, Eye, EyeOff, Check, ShieldCheck } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, Check, ShieldCheck } from "lucide-react";
+import { VeltrixLogo } from "@/components/ui/VeltrixLogo";
 
 /**
  * `LoginPage`
@@ -126,42 +127,19 @@ export default function LoginPage() {
         }}
       >
         {/* ── 1. Encabezado de la aplicación ────────────────────────────────── */}
-        <div style={{ textAlign: "center", marginBottom: "1.75rem" }}>
-          <div
-            style={{ display: "flex", justifyContent: "center", marginBottom: "0.75rem" }}
-          >
-            <div
-              style={{
-                background: "var(--primary)",
-                padding: "0.85rem",
-                borderRadius: "50%",
-                color: "white",
-                boxShadow: "0 4px 14px rgba(79, 70, 229, 0.4)",
-              }}
-            >
-              <PieChart size={30} aria-hidden="true" />
-            </div>
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "0.85rem" }}>
+            <VeltrixLogo size="lg" showText={true} showBadge={true} badgeText="ERP" />
           </div>
-
-          <h1
-            style={{
-              fontSize: "1.75rem",
-              fontWeight: 800,
-              letterSpacing: "-0.025em",
-              color: "var(--foreground)",
-            }}
-          >
-            Veltrix
-          </h1>
 
           <p
             style={{
               color: "var(--secondary-foreground)",
-              marginTop: "0.25rem",
-              fontSize: "0.875rem",
+              marginTop: "0.4rem",
+              fontSize: "0.85rem",
             }}
           >
-            ERP Contable &amp; Financiero Cloud
+            Plataforma Contable, Financiera &amp; Tributaria NIIF
           </p>
         </div>
 
