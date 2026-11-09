@@ -86,6 +86,12 @@ El menú lateral divide las 16 funciones en 4 áreas operativas lógicas:
 * **Toggle de Modo Oscuro Puro (OLED)**: Alterna entre el tema claro empresarial y el modo negro profundo (#000000) de máximo contraste.
 * **Panel Interactivo de Notificaciones**: Campana con badge en tiempo real de facturas pendientes, movimientos bancarios y cierres automáticos.
 
+### 2.3 Modo Responsivo para Móviles y Dispositivos Táctiles
+* **Barra Móvil & Botón Hamburguesa**: En teléfonos inteligentes y tabletas (pantallas $\le$ 1024px), la barra superior despliega un botón táctil optimizado (44x44px) que abre y cierra el menú lateral de forma fluida.
+* **Menú Deslizante (Drawer) con Telón de Fondo**: El menú lateral se desliza suavemente sobre la pantalla (`transform: translateX(0)`) acompañado de un fondo translúcido (`backdrop-filter: blur(4px)`).
+* **Navegación Táctil Autónoma**: Al presionar cualquier módulo o tocar el botón de cierre (`X`), el menú se retrae automáticamente para despejar el área de trabajo.
+* **Desplazamiento Suave**: Integración de `-webkit-overflow-scrolling: touch` para garantizar desplazamiento natural sin trabas en iOS Safari, Android Chrome, Edge y navegadores web modernos.
+
 ---
 
 ## Módulo 1: Dashboard Financiero Ejecutivo

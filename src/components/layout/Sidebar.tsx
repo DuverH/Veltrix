@@ -37,9 +37,11 @@ import {
   TrendingUp,
   LogOut,
   HelpCircle,
+  X,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { VeltrixLogo } from "@/components/ui/VeltrixLogo";
+import { useSidebar } from "./DashboardShell";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -64,6 +66,7 @@ interface NavSection {
  */
 export function Sidebar() {
   const pathname = usePathname();
+  const { isOpen, closeSidebar } = useSidebar();
 
   // ── Estructura jerárquica del menú ─────────────────────────────────────────
   const navigationSections: NavSection[] = [
@@ -105,116 +108,143 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="sidebar" aria-label="Navegación principal">
-      {/* ── 1. Logotipo oficial de la marca Veltrix ─────────────────────────── */}
-      <div className="sidebar-logo">
-        <Link href="/dashboard" style={{ textDecoration: "none" }}>
-          <VeltrixLogo size="md" showBadge={true} badgeText="ERP" />
-        </Link>
-      </div>
-
-      {/* ── 2. Lista de navegación categorizada con scroll ─────────────────── */}
-      <div style={{ flex: 1, overflowY: "auto", paddingRight: "4px" }}>
-        {navigationSections.map((section, idx) => (
-          <div key={section.title} style={{ marginBottom: "0.85rem" }}>
-            <div className="nav-section-title">{section.title}</div>
-
-            {section.items.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`nav-item ${isActive ? "active" : ""}`}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <Icon size={17} />
-                  <span style={{ flex: 1 }}>{item.name}</span>
-
-                  {item.badge && (
-                    <span
-                      style={{
-                        fontSize: "0.65rem",
-                        padding: "1px 5px",
-                        borderRadius: "4px",
-                        fontWeight: 700,
-                        background: isActive
-                          ? "rgba(255, 255, 255, 0.25)"
-                          : "rgba(99, 102, 241, 0.15)",
-                        color: isActive ? "#ffffff" : "var(--primary)",
-                      }}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-
-      {/* ── 3. Acciones de sesión y utilidades (Footer) ────────────────────── */}
+    <>
+      {/* ── Telón de fondo oscuro para móviles (Overlay) ─────────────────── */}
       <div
-        style={{
-          marginTop: "auto",
-          paddingTop: "0.85rem",
-          borderTop: "1px solid var(--border)",
-        }}
+        className={`sidebar-backdrop ${isOpen ? "active" : ""}`}
+        onClick={closeSidebar}
+        aria-hidden="true"
+      />
+
+      {/* ── Barra Lateral / Drawer Deslizante ────────────────────────────── */}
+      <aside
+        className={`sidebar ${isOpen ? "mobile-open" : ""}`}
+        aria-label="Navegación principal"
       >
-        <Link
-          href="/dashboard/settings"
-          className={`nav-item ${pathname === "/dashboard/settings" ? "active" : ""}`}
-          aria-current={pathname === "/dashboard/settings" ? "page" : undefined}
-        >
-          <Settings size={17} />
-          <span>Configuración</span>
-        </Link>
+        {/* ── 1. Logotipo oficial y botón cerrar para móvil ───────────────── */}
+        <div className="sidebar-logo flex items-center justify-between">
+          <Link href="/dashboard" onClick={closeSidebar} style={{ textDecoration: "none" }}>
+            <VeltrixLogo size="md" showBadge={true} badgeText="ERP" />
+          </Link>
 
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="nav-item"
-          aria-label="Cerrar sesión"
-          style={{
-            width: "100%",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            textAlign: "left",
-            color: "var(--destructive)",
-          }}
-        >
-          <LogOut size={17} />
-          <span>Cerrar Sesión</span>
-        </button>
+          {/* Botón de cierre visible en dispositivos táctiles / móviles */}
+          <button
+            onClick={closeSidebar}
+            className="mobile-sidebar-close-btn"
+            aria-label="Cerrar menú lateral"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-        {/* Indicador de versión y estado del sistema */}
+        {/* ── 2. Lista de navegación categorizada con scroll ───────────────── */}
+        <div style={{ flex: 1, overflowY: "auto", paddingRight: "4px" }}>
+          {navigationSections.map((section, idx) => (
+            <div key={section.title} style={{ marginBottom: "0.85rem" }}>
+              <div className="nav-section-title">{section.title}</div>
+
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href;
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={closeSidebar}
+                    className={`nav-item ${isActive ? "active" : ""}`}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    <Icon size={17} />
+                    <span style={{ flex: 1 }}>{item.name}</span>
+
+                    {item.badge && (
+                      <span
+                        style={{
+                          fontSize: "0.65rem",
+                          padding: "1px 5px",
+                          borderRadius: "4px",
+                          fontWeight: 700,
+                          background: isActive
+                            ? "rgba(255, 255, 255, 0.25)"
+                            : "rgba(99, 102, 241, 0.15)",
+                          color: isActive ? "#ffffff" : "var(--primary)",
+                        }}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* ── 3. Acciones de sesión y utilidades (Footer) ──────────────────── */}
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0.4rem 0.75rem 0 0.75rem",
-            fontSize: "0.7rem",
-            color: "var(--secondary-foreground)",
+            marginTop: "auto",
+            paddingTop: "0.85rem",
+            borderTop: "1px solid var(--border)",
           }}
         >
-          <span>Veltrix v0.1.0</span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-            <span
-              style={{
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%",
-                background: "var(--success)",
-              }}
-            />
-            En línea
-          </span>
+          <Link
+            href="/dashboard/settings"
+            onClick={closeSidebar}
+            className={`nav-item ${pathname === "/dashboard/settings" ? "active" : ""}`}
+            aria-current={pathname === "/dashboard/settings" ? "page" : undefined}
+          >
+            <Settings size={17} />
+            <span>Configuración</span>
+          </Link>
+
+          <button
+            onClick={() => {
+              closeSidebar();
+              signOut({ callbackUrl: "/login" });
+            }}
+            className="nav-item"
+            aria-label="Cerrar sesión"
+            style={{
+              width: "100%",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              textAlign: "left",
+              color: "var(--destructive)",
+            }}
+          >
+            <LogOut size={17} />
+            <span>Cerrar Sesión</span>
+          </button>
+
+          {/* Indicador de versión y estado del sistema */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0.4rem 0.75rem 0 0.75rem",
+              fontSize: "0.7rem",
+              color: "var(--secondary-foreground)",
+            }}
+          >
+            <span>Veltrix v0.1.0</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <span
+                style={{
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  background: "var(--success)",
+                }}
+              />
+              En línea
+            </span>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

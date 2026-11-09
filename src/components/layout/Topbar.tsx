@@ -21,6 +21,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import {
   Bell,
   Search,
@@ -46,10 +47,13 @@ import {
   Sparkles,
   Shield,
   Command,
+  Menu,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/providers/ThemeProvider";
+import { VeltrixLogo } from "@/components/ui/VeltrixLogo";
+import { useSidebar } from "./DashboardShell";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -99,6 +103,7 @@ export function Topbar() {
   const { data: session } = useSession();
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
+  const { toggleSidebar } = useSidebar();
 
   /* ── Estado de búsqueda rápida ──────────────────────────────────────────── */
   const [searchQuery, setSearchQuery] = useState("");
@@ -227,20 +232,39 @@ export function Topbar() {
 
   return (
     <header className="topbar" role="banner">
-      {/* ── 1. Búsqueda Global Inteligente con autocompletado ──────────────── */}
-      <div ref={searchContainerRef} style={{ position: "relative", width: "360px" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.6rem",
-            background: "var(--secondary)",
-            borderRadius: "var(--radius-sm)",
-            padding: "0.45rem 0.85rem",
-            border: "1px solid var(--border)",
-            transition: "all 0.15s ease",
-          }}
+      {/* ── Sección Izquierda: Botón Hamburguesa Móvil + Logo + Búsqueda ── */}
+      <div className="topbar-left-cluster">
+        {/* Botón hamburguesa visible solo en dispositivos móviles y táctiles */}
+        <button
+          onClick={toggleSidebar}
+          className="mobile-menu-toggle-btn"
+          aria-label="Desplegar u ocultar menú"
+          title="Abrir menú"
         >
+          <Menu size={22} />
+        </button>
+
+        {/* Logo compacto visible en móviles al lado del menú */}
+        <div className="mobile-brand-display">
+          <Link href="/dashboard" style={{ textDecoration: "none" }}>
+            <VeltrixLogo size="sm" showBadge={false} />
+          </Link>
+        </div>
+
+        {/* ── 1. Búsqueda Global Inteligente con autocompletado ──────────────── */}
+        <div className="topbar-search-wrapper" ref={searchContainerRef}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.6rem",
+              background: "var(--secondary)",
+              borderRadius: "var(--radius-sm)",
+              padding: "0.45rem 0.85rem",
+              border: "1px solid var(--border)",
+              transition: "all 0.15s ease",
+            }}
+          >
           <Search size={16} color="var(--secondary-foreground)" aria-hidden="true" />
           <input
             id="global-search-input"
@@ -384,10 +408,12 @@ export function Topbar() {
             )}
           </div>
         )}
+        </div>
       </div>
 
       {/* ── 2. Contexto de Empresa Activa ──────────────────────────────────── */}
       <div
+        className="topbar-company-badge"
         style={{
           display: "flex",
           alignItems: "center",

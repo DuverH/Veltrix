@@ -282,6 +282,216 @@ body {
   padding: 2rem;
   overflow-y: auto;
   background-color: var(--background);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Elementos de Interfaz Móvil y Táctil ──────────────────────────────────── */
+.topbar-left-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobile-menu-toggle-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 0.65rem;
+  border: 1px solid var(--border);
+  background: var(--secondary);
+  color: var(--foreground);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: all 0.15s ease;
+}
+
+.dark .mobile-menu-toggle-btn {
+  background: #0f1118;
+  border-color: #222534;
+}
+
+.mobile-menu-toggle-btn:hover,
+.mobile-menu-toggle-btn:active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.mobile-brand-display {
+  display: none;
+  align-items: center;
+}
+
+.mobile-sidebar-close-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--secondary);
+  color: var(--foreground);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: all 0.15s ease;
+}
+
+.dark .mobile-sidebar-close-btn {
+  background: #11131a;
+  border-color: #222534;
+}
+
+.mobile-sidebar-close-btn:hover,
+.mobile-sidebar-close-btn:active {
+  background: var(--destructive);
+  color: #ffffff;
+  border-color: var(--destructive);
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+.topbar-search-wrapper {
+  position: relative;
+  width: 340px;
+}
+
+/* ─── Media Query Responsivo para Dispositivos Móviles y Táctiles (≤ 1024px) ── */
+@media (max-width: 1024px) {
+  .app-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: hidden;
+  }
+
+  .mobile-menu-toggle-btn {
+    display: inline-flex;
+  }
+
+  .mobile-brand-display {
+    display: flex;
+  }
+
+  .mobile-sidebar-close-btn {
+    display: inline-flex;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .sidebar-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 290px;
+    max-width: 82vw;
+    height: 100vh;
+    z-index: 999;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.33, 1, 0.68, 1);
+    box-shadow: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.6);
+  }
+
+  .main-content {
+    width: 100vw;
+    min-width: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .topbar {
+    height: 62px;
+    padding: 0 1rem;
+    gap: 0.5rem;
+  }
+
+  .topbar-search-wrapper {
+    display: none;
+  }
+
+  .topbar-company-badge {
+    display: none !important;
+  }
+
+  .page-content {
+    padding: 1rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .ai-grid-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+
+  .ai-presets-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    padding: 0 0.75rem;
+  }
+
+  .page-content {
+    padding: 0.75rem;
+  }
+
+  .ai-panel {
+    padding: 1.25rem;
+  }
+
+  .ai-header-card {
+    padding: 1.25rem;
+  }
 }
 
 /* ─── Tarjetas & Paneles ─────────────────────────────────────────────────────── */

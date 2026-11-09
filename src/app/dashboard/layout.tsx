@@ -20,6 +20,7 @@
 
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
+import { DashboardShell } from "@/components/layout/DashboardShell";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
@@ -28,7 +29,7 @@ import { redirect } from "next/navigation";
  *
  * Layout padre de todas las páginas dentro de `/dashboard`.
  * Verifica autenticación en el servidor y monta la estructura
- * visual (sidebar + topbar + área de contenido).
+ * visual responsiva (sidebar móvil + topbar + área de contenido).
  *
  * @param children - Página activa renderizada por Next.js App Router.
  */
@@ -38,52 +39,26 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   /* ── Verificación de sesión en servidor ─────────────────────────────────── */
-
-  /**
-   * `getServerSession` lee el cookie de sesión del request entrante.
-   * Si no existe, `session` es `null` y se redirige al login.
-   * No expone el token al cliente, lo que es más seguro que verificarlo
-   * sólo desde el middleware.
-   */
   const session = await getServerSession();
 
   if (!session) {
-    /*
-     * `redirect` lanza un error interno de Next.js que detiene el render
-     * y retorna un 307 Temporary Redirect al cliente.
-     */
     redirect("/login");
   }
 
-  /* ── Render del layout ──────────────────────────────────────────────────── */
-
+  /* ── Render del layout responsivo con DashboardShell ────────────────────── */
   return (
-    /*
-     * `.app-container` establece el layout flex horizontal de pantalla completa:
-     *   flex-direction: row → Sidebar | contenido
-     *   height: 100vh       → ocupa toda la altura de la ventana
-     *   overflow: hidden    → el scroll lo gestiona `.page-content`
-     */
-    <div className="app-container">
-
-      {/* Barra lateral de navegación (ancho fijo, flex-shrink: 0 implícito) */}
+    <DashboardShell>
+      {/* Barra lateral de navegación (modo escritorio o cajón móvil deslizante) */}
       <Sidebar />
 
-      {/* Área principal: topbar + contenido desplazable */}
+      {/* Área principal: topbar responsiva + contenido desplazable */}
       <div className="main-content">
-
-        {/* Barra superior con búsqueda, toggle de tema y perfil de usuario */}
+        {/* Barra superior con botón hamburguesa móvil, búsqueda, tema y perfil */}
         <Topbar />
 
-        {/*
-         * Área de contenido desplazable.
-         * Los componentes hijos (páginas) aplican su propio padding interno
-         * y no deben sobrescribir el `overflow-y: auto` de esta clase.
-         */}
-        <main className="page-content">
-          {children}
-        </main>
+        {/* Área de contenido desplazable */}
+        <main className="page-content">{children}</main>
       </div>
-    </div>
+    </DashboardShell>
   );
 }
