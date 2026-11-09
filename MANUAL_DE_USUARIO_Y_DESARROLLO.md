@@ -27,7 +27,8 @@
 16. [Módulo 14: Estados Financieros NIIF (Balance, PyG, Flujo)](#módulo-14-estados-financieros-niif-balance-pyg-flujo)
 17. [Módulo 15: Auditoría Inmutable (Blockchain SHA-256)](#módulo-15-auditoría-inmutable-blockchain-sha-256)
 18. [Módulo 16: Configuración del Sistema](#módulo-16-configuración-del-sistema)
-19. [Guía para Desarrolladores: Cómo Modificar y Extender](#19-guía-para-desarrolladores-cómo-modificar-y-extender)
+19. [Módulo 17: Protección de Datos, Auditoría de Riesgos & Disaster Recovery](#módulo-17-protección-de-datos-auditoría-de-riesgos--disaster-recovery)
+20. [Guía para Desarrolladores: Cómo Modificar y Extender](#20-guía-para-desarrolladores-cómo-modificar-y-extender)
 
 ---
 
@@ -389,7 +390,42 @@ Definición de parámetros empresariales (Razón social, NIT, mes de cierre, IVA
 
 ---
 
-## 19. Guía para Desarrolladores: Cómo Modificar y Extender
+## Módulo 17: Protección de Datos, Auditoría de Riesgos & Disaster Recovery
+
+* **Ruta de acceso**: `/dashboard/settings` (Pestaña "Seguridad y Datos")
+* **Archivos clave**:
+  - Vista: `src/app/dashboard/settings/page.tsx`
+  - Servicio de Respaldo Criptográfico: `src/lib/security/backup-service.ts`
+  - Servicio de Diagnóstico de Riesgos: `src/lib/security/risk-audit-service.ts`
+  - Endpoints API:
+    - `src/app/api/security/backup/route.ts` (GET estadísticas y registro, POST generación de backup)
+    - `src/app/api/security/audit-health/route.ts` (GET escaneo en tiempo real de salud contable y riesgos)
+  - Hardening HTTP: `next.config.ts`
+
+### Propósito
+Garantizar la resiliencia operativa, la inmutabilidad de la información contable y el estricto cumplimiento normativo colombiano (Habeas Data Ley 1581 de 2012, conservación de libros de comercio Art. 134 D. 2649/1993 y Art. 28 Ley 962/2005, y resoluciones de facturación electrónica DIAN).
+
+### Características Principales:
+1. **Respaldo en Caliente con Firma Criptográfica SHA-256**:
+   - Generación instantánea en formato JSON estructurado con volcado atómico de todos los modelos (Cuentas PUC, Asientos, Facturas, Terceros, Activos, Préstamos, etc.).
+   - Cálculo automático de checksum SHA-256 para validación de no alteración ni corrupción de archivos.
+   - Registro automático del evento de respaldo en la cadena de auditoría inmutable.
+   - Descarga directa de emergencia de archivos tipo `Veltrix_Backup_[TIMESTAMP]_[HASH].json`.
+2. **Motor de Diagnóstico y Salud Contable en Tiempo Real (Health Score 0-100%)**:
+   - **Verificación de Partida Doble**: Valida matemáticamente que $\sum \text{Débitos} = \sum \text{Créditos}$ en toda la base contable histórica.
+   - **Detección de Saldos Rojos Anómalos**: Alerta inmediata si cuentas de disponible (Caja 1105 o Bancos 1110) presentan saldo negativo no conciliado.
+   - **Cumplimiento DIAN**: Identificación de facturas emitidas sin código CUFE o sin firma electrónica válida.
+   - **Cumplimiento Habeas Data**: Detección de terceros registrados sin número de identificación tributaria (NIT/Cédula) o clasificación de persona.
+3. **Seguridad Perimetral HTTP (Grado Bancario)**:
+   - Encabezados estrictos configurados en el servidor: `Strict-Transport-Security` (HSTS de 2 años con subdominios y preload), `X-Frame-Options: DENY` (anti clickjacking), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` y supresión del header `X-Powered-By`.
+4. **Política de Retención Legal y Recuperación ante Desastres (Disaster Recovery)**:
+   - RPO (Recovery Point Objective): Respaldo instantáneo descargable y compatible con replicación multi-región Turso LibSQL.
+   - RTO (Recovery Time Objective): Reconstrucción en menos de 5 minutos mediante script o API de importación atómica con control transaccional.
+   - Garantía de retención de 10 años conforme a la legislación fiscal colombiana.
+
+---
+
+## 20. Guía para Desarrolladores: Cómo Modificar y Extender
 
 ### 19.1 Cómo Añadir un Nuevo Campo a un Modelo
 1. Abrir `prisma/schema.prisma` y añadir el atributo al modelo correspondiente:
@@ -414,3 +450,4 @@ Definición de parámetros empresariales (Razón social, NIT, mes de cierre, IVA
 Para ajustar tonos o contrastes, edita las variables en `src/app/globals.css`:
 * `:root` para modo claro.
 * `.dark` para el modo oscuro puro (OLED).
+
