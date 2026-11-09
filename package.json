@@ -9,6 +9,7 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
+    "db:turso": "node prisma/push-turso.js",
     "db:seed": "node prisma/seed-data.js"
   },
   "dependencies": {
