@@ -21,7 +21,7 @@
 
 ---
 
-## 🚀 Características Principales
+## Características Principales
 
 * **Plan Único de Cuentas (PUC)**: Jerarquía dinámica multiescala con validación estricta de partida doble en cada transacción.
 * **Libro Diario & Mayor**: Asientos contables automáticos y manuales con balance de comprobación en tiempo real.
@@ -36,7 +36,7 @@
 
 ---
 
-## 🛠️ Puesta en Marcha Local
+## Puesta en Marcha Local
 
 ### 1. Requisitos
 * **Node.js**: 20.x o superior
@@ -65,13 +65,13 @@ Abre en una nueva pestaña de tu navegador: [`http://localhost:3000`](http://loc
 > * **Seguridad de navegadores (HTTPS vs HTTP)**: GitHub se sirve bajo HTTPS. Navegadores modernos como Chrome o Edge bloquean o intentan auto-convertir a `https://localhost:3000` los enlaces `http://` abiertos desde páginas seguras, generando un error `ERR_CONNECTION_REFUSED` o de certificado. Copia y pega directamente `http://localhost:3000` en una pestaña limpia de tu navegador.
 > * **Para acceder desde internet / GitHub**: Consulta la sección **Despliegue a Producción** abajo para publicar la aplicación con su propia URL pública HTTPS (ej. Vercel o Docker).
 
-### 🔑 Credenciales de Acceso Iniciales:
+### Credenciales de Acceso Iniciales:
 * **Email**: `admin@erp.com`
 * **Contraseña**: `Admin2026!*` *(cifrada con bcrypt en base de datos)*
 
 ---
 
-## 🌐 Guías de Despliegue a Producción
+## Guías de Despliegue a Producción
 
 Veltrix está optimizado para producción tanto en arquitecturas Serverless (Vercel) como en contenedores independientes (Docker / VPS / Railway).
 
@@ -145,7 +145,7 @@ Veltrix está optimizado para producción tanto en arquitecturas Serverless (Ver
 
 ---
 
-## 🩺 Monitoreo y Salud del Sistema
+## Monitoreo y Salud del Sistema
 
 Veltrix incluye un endpoint de comprobación de estado para balanceadores de carga y herramientas de monitorización (Uptime Kuma, BetterStack, Datadog):
 
@@ -162,7 +162,7 @@ Veltrix incluye un endpoint de comprobación de estado para balanceadores de car
 
 ---
 
-## 📦 Scripts Disponibles
+## Scripts Disponibles
 
 * `npm run dev`: Inicia el servidor de desarrollo local con Turbopack.
 * `npm run build`: Genera la compilación optimizada de producción (Standalone).
