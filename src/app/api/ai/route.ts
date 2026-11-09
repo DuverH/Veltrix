@@ -1,3 +1,16 @@
+/**
+ * @file route.ts
+ * @description Endpoint API unificado para servicios de Inteligencia Artificial Contable (Veltrix AI).
+ *
+ * Acciones soportadas vía método POST:
+ *   - `ocr_parse`: Extracción y clasificación automática de facturas de compra (OCR / UBL 2.1).
+ *   - `post_ocr_invoice`: Asienta la factura procesada en el Libro Diario y registra la Cuenta por Pagar.
+ *   - `cfo_query`: Consulta analítica en lenguaje natural al Director Financiero Virtual (AI CFO).
+ *   - `natural_entry`: Generación de propuesta de asiento contable de partida doble por prompt.
+ *   - `post_natural_entry`: Registra el asiento contable propuesto en el Libro Diario.
+ *   - `audit_anomalies`: Escaneo proactivo de anomalías contables y riesgos de evasión.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { AIAccountingService } from "@/lib/ai/ai-accounting-service";
 import { prisma } from "@/lib/prisma";
@@ -33,6 +46,38 @@ export async function POST(req: NextRequest) {
       const { question } = body;
       const result = await AIAccountingService.queryCfoBot(company.id, question || "");
       return NextResponse.json({ success: true, ...result });
+    }
+
+    if (action === "natural_entry") {
+      const { prompt } = body;
+      const result = await AIAccountingService.generateNaturalEntry(company.id, prompt || "");
+      return NextResponse.json({ success: true, data: result });
+    }
+
+    if (action === "post_natural_entry") {
+      const { entryData } = body;
+      const { AccountingEngine } = await import("@/lib/accounting/double-entry");
+
+      const created = await AccountingEngine.createJournalEntry({
+        companyId: company.id,
+        date: new Date(),
+        description: entryData.description,
+        reference: entryData.reference,
+        type: "MANUAL",
+        lines: entryData.lines.map((l: any) => ({
+          accountId: l.accountId,
+          description: l.description,
+          debit: l.debit || 0,
+          credit: l.credit || 0,
+        })),
+      });
+
+      return NextResponse.json({ success: true, entry: created });
+    }
+
+    if (action === "audit_anomalies") {
+      const result = await AIAccountingService.auditAnomalies(company.id);
+      return NextResponse.json({ success: true, data: result });
     }
 
     return NextResponse.json({ error: "Acción no válida" }, { status: 400 });

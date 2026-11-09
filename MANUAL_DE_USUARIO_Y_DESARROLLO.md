@@ -145,27 +145,46 @@ Centro neurálgico contable bajo NIIF. Administra el catálogo PUC colombiano a 
 
 ---
 
-## Módulo 3: Asistente IA Contable & OCR
+## Módulo 3: Asistente IA Contable, OCR & Copilot NIIF
 
 * **Ruta de acceso**: `/dashboard/ai-assistant`
 * **Archivos clave**:
   - Vista: `src/app/dashboard/ai-assistant/page.tsx`
   - API: `src/app/api/ai/route.ts`
-  - Servicio: `src/lib/ai/ai-accounting-service.ts`
+  - Servicio de Inteligencia Artificial: `src/lib/ai/ai-accounting-service.ts`
 
 ### Propósito
-Acelera el registro de compras, gastos y facturas de proveedores mediante análisis inteligente de texto, extracción de datos clave y sugerencia de cuentas contables.
+Automatiza integralmente la causación de compras, la consulta analítica ejecutiva y la generación de asientos contables mediante redes neuronales, modelos predictivos del PUC colombiano y heurísticas tributarias NIIF/DIAN.
 
-### Utilización
-1. **Carga o Pegado de Factura**: Pega el texto extraído de una factura física o digital (proveedor, NIT, base gravable, IVA, total).
-2. **Analizar con IA**: El motor detecta automáticamente:
-   - Proveedor y NIT.
-   - Base gravable e IVA (19% o 5%).
-   - Retención en la fuente sugerida (ej. 2.5% o 3.5% para compras/servicios).
-3. **Pre-contabilización en 1 Clic**: Genera el borrador del asiento con la cuenta de gasto (`51...`), IVA descontable (`2408...`), Retefuente (`2365...`) y Cuenta por Pagar (`2205...`).
+### Características y Funcionalidades por Pestaña
 
-### Modificación Técnica
-* Para conectar un modelo de LLM externo (OpenAI, Gemini API o Anthropic Claude), edita `src/lib/ai/ai-accounting-service.ts` configurando tu API Key y agregando el parser en `classifyDocument()`.
+#### 1. Scanner OCR & Facturación Inteligente (UBL 2.1)
+* **Plantillas Frecuentes**: Acceso con 1 clic a esquemas de Cloud/Servidores, Honorarios Jurídicos, Arrendamiento y Papelería.
+* **Extracción Heurística Automática**: Identifica Razón Social del emisor, NIT, número de factura, fecha de emisión y vencimiento.
+* **Mapeo Predictivo PUC NIIF**: Sugiere la cuenta contable exacta (ej. 514510 para tecnología, 512010 para arrendamiento, 511025 para honorarios) con un índice de confianza porcentual.
+* **Liquidación Tributaria Exacta**: Calcula Subtotal, IVA Descontable del 19% (+), Retención en la Fuente del 2.5% (-) y el Saldo Neto en Cuentas por Pagar (CXP).
+* **Contabilización en 1 Clic**: Guarda el asiento en el Libro Diario (`JournalEntry`) y crea la factura de compra (`Invoice PAYABLE`).
+
+#### 2. Director Financiero Virtual (AI CFO Copilot)
+* **Métricas en Vivo**: Consulta en tiempo real de Efectivo disponible (Cuentas 11), Margen Operativo Neto y Razón Corriente de Solvencia.
+* **Consultas Financieras en Lenguaje Natural**:
+  - *"¿Cuál es mi liquidez y solvencia?"*: Retorna el balance de tesorería y la razón corriente de respaldo ante pasivos inmediatos.
+  - *"¿Cuánto debemos pagar de impuestos a la DIAN?"*: Proyecta el saldo de IVA por pagar (2408) y retenciones practicadas (2365).
+  - *"¿Cómo está el margen y rentabilidad?"*: Entrega el P&L operacional con ingresos y costos consolidados.
+  - *"¿Cuál es el estado de la cartera de clientes?"*: Resume cuentas por cobrar y recomienda estrategias de recaudo.
+
+#### 3. Causación en Lenguaje Natural
+* **Generación de Asientos por Prompt**: Permite redactar lo que ocurrió (ej. *"Pagamos $4.500.000 de arrendamiento de la oficina por transferencia Bancolombia"*).
+* **Estructuración de Partida Doble**: La IA analiza el concepto, busca o crea las cuentas correspondientes en el PUC de la empresa y estructura la tabla con Débitos y Créditos balanceados ($\sum \text{Débitos} = \sum \text{Créditos}$).
+* **Asentamiento Inmediato**: Un botón permite validar y postear directamente al Libro Diario general sin digitar comprobantes manualmente.
+
+#### 4. Auditor Neuronal de Riesgos & Anomalías
+* **Detección Preventiva**: Escanea los saldos de todas las cuentas activas detectando saldos en rojo en bancos/caja y facturas de clientes vencidas sin cobro.
+* **Índice de Confiabilidad**: Puntaje de salud de 0 a 100 con acciones sugeridas para optimización fiscal y de tesorería.
+
+### Modificación Técnica y Extensión
+* **Añadir Nuevas Reglas de Clasificación**: En `src/lib/ai/ai-accounting-service.ts`, modificar el método `predictPucAccount(text: string)`.
+* **Conectar un Modelo de Lenguaje Externo (ej. Gemini o OpenAI)**: En `src/lib/ai/ai-accounting-service.ts`, sustituir o extender las funciones `parseInvoiceText` o `queryCfoBot` consumiendo la API de inferencia deseada.
 
 ---
 
