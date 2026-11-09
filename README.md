@@ -13,6 +13,12 @@
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License" />
 </p>
 
+<p align="center">
+  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FDuverH%2FVeltrix">
+    <img src="https://vercel.com/button" alt="Deploy with Vercel" />
+  </a>
+</p>
+
 ---
 
 ## 🚀 Características Principales
@@ -51,7 +57,13 @@ npm run db:seed
 npm run dev
 ```
 
-Abre en tu navegador: [http://localhost:3000](http://localhost:3000)
+Abre en una nueva pestaña de tu navegador: [`http://localhost:3000`](http://localhost:3000)
+
+> [!NOTE]
+> **¿Por qué no abre al hacer clic directamente desde GitHub?**
+> * **Servidor local requerido**: `localhost` hace referencia a tu propia computadora, no a un servidor en internet. Requiere que ejecutes `npm run dev` previamente en tu terminal.
+> * **Seguridad de navegadores (HTTPS vs HTTP)**: GitHub se sirve bajo HTTPS. Navegadores modernos como Chrome o Edge bloquean o intentan auto-convertir a `https://localhost:3000` los enlaces `http://` abiertos desde páginas seguras, generando un error `ERR_CONNECTION_REFUSED` o de certificado. Copia y pega directamente `http://localhost:3000` en una pestaña limpia de tu navegador.
+> * **Para acceder desde internet / GitHub**: Consulta la sección **Despliegue a Producción** abajo para publicar la aplicación con su propia URL pública HTTPS (ej. Vercel o Docker).
 
 ### 🔑 Credenciales de Acceso Iniciales:
 * **Email**: `admin@erp.com`
