@@ -3,17 +3,15 @@
  * @description Página de inicio de sesión de Veltrix ERP.
  *
  * Flujo:
- *   1. El usuario introduce su correo y contraseña.
+ *   1. El usuario introduce su correo (o usuario "admin") y contraseña.
  *   2. Se llama a `signIn("credentials", { redirect: false })` de NextAuth.
  *   3. Si la autenticación es exitosa, se redirige a `/dashboard`.
- *   4. Si falla, se muestra un mensaje de error en pantalla.
+ *   4. Si falla, se muestra un mensaje de error con sugerencias claras.
  *
- * Estilo:
- *   - El fondo y el panel de formulario respetan los tokens CSS del tema activo
- *     (claro u oscuro), de modo que el cambio de tema es automático sin
- *     necesidad de lógica adicional en este componente.
- *   - Se usa la clase `.glass-panel` que tiene variantes para ambos temas
- *     definidas en `globals.css`.
+ * Usabilidad:
+ *   - Botón para mostrar/ocultar contraseña (evita errores de tipografía).
+ *   - Botón de auto-completado rápido para credenciales de prueba.
+ *   - Compatible con tema claro y oscuro de Veltrix.
  */
 
 "use client";
@@ -21,78 +19,90 @@
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { PieChart, Lock, Mail } from "lucide-react";
+import { PieChart, Lock, Mail, Eye, EyeOff, Check, ShieldCheck } from "lucide-react";
 
 /**
  * `LoginPage`
  *
  * Renderiza el formulario de autenticación centrado verticalmente en pantalla.
- * Es una página pública — el middleware excluye `/login` de la protección.
+ * Página pública excluida de la protección del middleware.
  */
 export default function LoginPage() {
   const router = useRouter();
 
   /* ── Estado del formulario ──────────────────────────────────────────────── */
 
-  /**
-   * Valores iniciales precargados para facilitar el acceso en modo demo.
-   * En un entorno de producción real estos campos estarían vacíos.
-   */
+  /** Usuario / Correo predeterminado */
   const [email, setEmail] = useState("admin@erp.com");
+
+  /** Contraseña predeterminada */
   const [password, setPassword] = useState("Admin2026!*");
+
+  /** Control de visibilidad de la contraseña en texto plano */
+  const [showPassword, setShowPassword] = useState(false);
 
   /** Mensaje de error visible al usuario tras un intento fallido */
   const [error, setError] = useState("");
 
-  /** Indica si hay una petición de autenticación en curso */
+  /** Indicador de petición de autenticación en curso */
   const [loading, setLoading] = useState(false);
 
-  /* ── Manejador de envío ─────────────────────────────────────────────────── */
+  /** Indicador visual temporal cuando se autocompletan las credenciales */
+  const [autoFilled, setAutoFilled] = useState(false);
+
+  /* ── Manejadores de eventos ─────────────────────────────────────────────── */
 
   /**
    * `handleSubmit`
    *
-   * Previene el comportamiento por defecto del formulario, llama a NextAuth
-   * con las credenciales ingresadas y gestiona la respuesta.
+   * Procesa el envío del formulario mediante NextAuth.
    *
-   * @param e - Evento de envío del formulario
+   * @param e - Evento del formulario HTML
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(""); // Limpia errores previos
+    setError("");
 
     try {
       const res = await signIn("credentials", {
-        redirect: false, // Manejamos la redirección manualmente
+        redirect: false,
         email,
         password,
       });
 
       if (res?.error) {
-        // Error de autenticación (credenciales incorrectas, usuario inactivo, etc.)
-        setError("Credenciales inválidas. Verifica tu correo y contraseña.");
+        setError("Usuario o contraseña incorrectos. Puedes usar admin@erp.com con Admin2026!* o admin.");
       } else {
-        // Autenticación exitosa → redirigir al dashboard principal
         router.push("/dashboard");
-        router.refresh(); // Fuerza la actualización del layout del servidor
+        router.refresh();
       }
     } catch {
-      // Error inesperado de red o servidor
-      setError("Error al conectar con el servidor. Intenta de nuevo.");
+      setError("Error de conexión al servidor de autenticación. Intenta nuevamente.");
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * `fillCredentials`
+   *
+   * Autocompleta los campos de usuario y contraseña con las credenciales maestras.
+   *
+   * @param demoUser - Correo o nombre de usuario
+   * @param demoPass - Contraseña preestablecida
+   */
+  const fillCredentials = (demoUser: string, demoPass: string) => {
+    setEmail(demoUser);
+    setPassword(demoPass);
+    setError("");
+    setAutoFilled(true);
+    setTimeout(() => setAutoFilled(false), 2000);
+  };
+
   /* ── Render ─────────────────────────────────────────────────────────────── */
 
   return (
-    /*
-     * Contenedor de pantalla completa con gradiente de fondo.
-     * Los colores del gradiente usan tokens CSS y cambian automáticamente
-     * con el tema activo.
-     */
     <div
       style={{
         display: "flex",
@@ -102,43 +112,37 @@ export default function LoginPage() {
         background:
           "linear-gradient(135deg, var(--background) 0%, var(--secondary) 100%)",
         transition: "background 0.3s ease",
+        padding: "1rem",
       }}
     >
-      {/*
-       * Panel de formulario con efecto glass-morphism.
-       * `.glass-panel` tiene variantes para claro y oscuro en globals.css.
-       */}
       <div
         className="glass-panel"
         style={{
-          padding: "3rem",
+          padding: "2.5rem",
           borderRadius: "1.25rem",
           width: "100%",
           maxWidth: "420px",
           boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
         }}
       >
-        {/* ── Encabezado con logo y nombre ────────────────────────────────── */}
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-
-          {/* Logo circular con color primario */}
+        {/* ── 1. Encabezado de la aplicación ────────────────────────────────── */}
+        <div style={{ textAlign: "center", marginBottom: "1.75rem" }}>
           <div
-            style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}
+            style={{ display: "flex", justifyContent: "center", marginBottom: "0.75rem" }}
           >
             <div
               style={{
                 background: "var(--primary)",
-                padding: "1rem",
+                padding: "0.85rem",
                 borderRadius: "50%",
                 color: "white",
                 boxShadow: "0 4px 14px rgba(79, 70, 229, 0.4)",
               }}
             >
-              <PieChart size={32} aria-hidden="true" />
+              <PieChart size={30} aria-hidden="true" />
             </div>
           </div>
 
-          {/* Nombre de la aplicación */}
           <h1
             style={{
               fontSize: "1.75rem",
@@ -150,47 +154,44 @@ export default function LoginPage() {
             Veltrix
           </h1>
 
-          {/* Subtítulo descriptivo */}
           <p
             style={{
               color: "var(--secondary-foreground)",
-              marginTop: "0.3rem",
-              fontSize: "0.9rem",
+              marginTop: "0.25rem",
+              fontSize: "0.875rem",
             }}
           >
             ERP Contable &amp; Financiero Cloud
           </p>
         </div>
 
-        {/* ── Formulario de autenticación ──────────────────────────────────── */}
+        {/* ── 2. Formulario de acceso ───────────────────────────────────────── */}
         <form onSubmit={handleSubmit}>
-
-          {/* Alerta de error — solo visible si `error` tiene contenido */}
+          {/* Mensaje de alerta de error */}
           {error && (
             <div
               role="alert"
               style={{
-                background: "rgba(239, 68, 68, 0.1)",
+                background: "rgba(239, 68, 68, 0.12)",
                 color: "var(--destructive)",
                 border: "1px solid var(--destructive)",
-                padding: "0.75rem",
+                padding: "0.75rem 1rem",
                 borderRadius: "0.5rem",
                 marginBottom: "1rem",
-                textAlign: "center",
-                fontSize: "0.875rem",
+                fontSize: "0.825rem",
+                lineHeight: 1.4,
               }}
             >
               {error}
             </div>
           )}
 
-          {/* ── Campo de correo electrónico ──────────────────────────────── */}
+          {/* Campo: Correo / Usuario */}
           <div className="form-group" style={{ position: "relative" }}>
             <label htmlFor="login-email" className="form-label">
-              Correo Electrónico
+              Correo Electrónico o Usuario
             </label>
             <div style={{ position: "relative" }}>
-              {/* Ícono decorativo dentro del input */}
               <Mail
                 size={18}
                 aria-hidden="true"
@@ -205,27 +206,27 @@ export default function LoginPage() {
               />
               <input
                 id="login-email"
-                type="email"
+                type="text"
                 className="premium-input"
                 style={{ paddingLeft: "2.75rem" }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
+                placeholder="admin@erp.com o admin"
+                autoComplete="username"
                 required
               />
             </div>
           </div>
 
-          {/* ── Campo de contraseña ──────────────────────────────────────── */}
+          {/* Campo: Contraseña con toggle Ver/Ocultar */}
           <div
             className="form-group"
-            style={{ position: "relative", marginBottom: "2rem" }}
+            style={{ position: "relative", marginBottom: "1.75rem" }}
           >
             <label htmlFor="login-password" className="form-label">
               Contraseña
             </label>
             <div style={{ position: "relative" }}>
-              {/* Ícono decorativo dentro del input */}
               <Lock
                 size={18}
                 aria-hidden="true"
@@ -240,18 +241,40 @@ export default function LoginPage() {
               />
               <input
                 id="login-password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 className="premium-input"
-                style={{ paddingLeft: "2.75rem" }}
+                style={{ paddingLeft: "2.75rem", paddingRight: "2.75rem" }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 required
               />
+              {/* Botón para alternar visibilidad de contraseña */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                title={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                style={{
+                  position: "absolute",
+                  right: "0.75rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "var(--secondary-foreground)",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0.25rem",
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
-          {/* ── Botón de envío ───────────────────────────────────────────── */}
+          {/* Botón principal de inicio de sesión */}
           <button
             type="submit"
             className="premium-btn"
@@ -259,35 +282,65 @@ export default function LoginPage() {
             disabled={loading}
             aria-busy={loading}
           >
-            {/* Texto cambia durante la carga para dar retroalimentación visual */}
             {loading ? "Autenticando..." : "Iniciar Sesión"}
           </button>
 
-          {/* ── Panel informativo de credenciales demo ───────────────────── */}
+          {/* ── 3. Tarjeta de credenciales rápidas de prueba ───────────────── */}
           <div
             style={{
-              marginTop: "1.5rem",
+              marginTop: "1.25rem",
               padding: "0.85rem",
               borderRadius: "0.6rem",
               background: "rgba(79, 70, 229, 0.06)",
-              border: "1px solid rgba(79, 70, 229, 0.18)",
+              border: "1px solid rgba(79, 70, 229, 0.2)",
               fontSize: "0.8rem",
-              textAlign: "center",
-              color: "var(--secondary-foreground)",
             }}
           >
-            <p
+            <div
               style={{
-                fontWeight: 600,
-                color: "var(--foreground)",
-                marginBottom: "0.3rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "0.4rem",
               }}
             >
-              Credenciales de acceso:
-            </p>
-            <p style={{ fontFamily: "monospace", letterSpacing: "0.02em" }}>
-              admin@erp.com &bull; Admin2026!*
-            </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  fontWeight: 600,
+                  color: "var(--foreground)",
+                }}
+              >
+                <ShieldCheck size={16} color="var(--primary)" />
+                <span>Credenciales válidas:</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => fillCredentials("admin@erp.com", "Admin2026!*")}
+                style={{
+                  background: "var(--primary)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  padding: "2px 8px",
+                  fontSize: "0.72rem",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
+                {autoFilled ? <Check size={12} /> : null}
+                {autoFilled ? "Cargado" : "Cargar"}
+              </button>
+            </div>
+
+            <div style={{ color: "var(--secondary-foreground)", fontSize: "0.75rem", lineHeight: 1.5 }}>
+              <div><strong>Usuario:</strong> <code>admin@erp.com</code> (o simplemente <code>admin</code>)</div>
+              <div><strong>Clave:</strong> <code>Admin2026!*</code> o <code>admin</code></div>
+            </div>
           </div>
         </form>
       </div>

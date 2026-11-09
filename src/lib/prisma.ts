@@ -1,3 +1,13 @@
+/**
+ * @file prisma.ts
+ * @description Cliente de Prisma Singleton configurado con el adaptador LibSQL.
+ *
+ * Características:
+ *   - Compatible tanto con SQLite local (`dev.db`) como con Turso en la nube (`libsql://...`).
+ *   - Compatible con ejecución en Server Components, API routes y empaquetado Next.js.
+ *   - Patrón Singleton en desarrollo para evitar agotar las conexiones durante Hot Module Replacement (HMR).
+ */
+
 import { PrismaClient } from '@prisma/client';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
 
